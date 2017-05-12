@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.broker;
 
@@ -160,13 +160,16 @@ public class BrokerStartup {
 
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), brokerConfig);
 
+            brokerConfig.setRocketmqHome("D:\\IDEALearnSpace\\part2\\RocketMQ");
             if (null == brokerConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
                         + " variable in your environment to match the location of the RocketMQ installation");
                 System.exit(-2);
             }
 
+            brokerConfig.setNamesrvAddr("127.0.0.1:9876");
             String namesrvAddr = brokerConfig.getNamesrvAddr();
+            System.out.println("namesrv:" + namesrvAddr);
             if (null != namesrvAddr) {
                 try {
                     String[] addrArray = namesrvAddr.split(";");
@@ -257,15 +260,16 @@ public class BrokerStartup {
         return null;
     }
 
-    private static void parsePropertie2SystemEnv(Properties properties){
-        if(properties ==null){
+    private static void parsePropertie2SystemEnv(Properties properties) {
+        if (properties == null) {
             return;
         }
-        String rmqAddressServerDomain = properties.getProperty("rmqAddressServerDomain","jmenv.tbsite.net");
-        String rmqAddressServerSubGroup = properties.getProperty("rmqAddressServerSubGroup","nsaddr");
-        System.setProperty("rocketmq.namesrv.domain",rmqAddressServerDomain);
-        System.setProperty("rocketmq.namesrv.domain.subgroup",rmqAddressServerSubGroup);
+        String rmqAddressServerDomain = properties.getProperty("rmqAddressServerDomain", "jmenv.tbsite.net");
+        String rmqAddressServerSubGroup = properties.getProperty("rmqAddressServerSubGroup", "nsaddr");
+        System.setProperty("rocketmq.namesrv.domain", rmqAddressServerDomain);
+        System.setProperty("rocketmq.namesrv.domain.subgroup", rmqAddressServerSubGroup);
     }
+
     public static Options buildCommandlineOptions(final Options options) {
         Option opt = new Option("c", "configFile", true, "Broker config properties file");
         opt.setRequired(false);

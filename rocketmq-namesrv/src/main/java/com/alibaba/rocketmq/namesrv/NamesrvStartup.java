@@ -102,6 +102,8 @@ public class NamesrvStartup {
 
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);
 
+            //set rocketmqhome
+            namesrvConfig.setRocketmqHome("D:\\IDEALearnSpace\\part2\\RocketMQ");
             if (null == namesrvConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
                         + " variable in your environment to match the location of the RocketMQ installation");

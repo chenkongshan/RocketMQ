@@ -55,6 +55,12 @@ public class MQAdminStartup {
     protected static List<SubCommand> subCommandList = new ArrayList<SubCommand>();
 
     public static void main(String[] args) {
+        args = new String[5];
+        args[0] = "updateTopic";
+        args[1] = "-n";
+        args[2] = "127.0.0.1:9876";
+        args[3] = "-t";
+        args[4] = "test";
         main0(args, null);
     }
 
@@ -179,6 +185,7 @@ public class MQAdminStartup {
         JoranConfigurator configurator = new JoranConfigurator();
         configurator.setContext(lc);
         lc.reset();
+        rocketmqHome = "D:\\IDEALearnSpace\\part2\\RocketMQ";
         configurator.doConfigure(rocketmqHome + "/conf/logback_tools.xml");
     }
 
