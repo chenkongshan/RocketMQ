@@ -429,6 +429,7 @@ public class RouteInfoManager {
         while (it.hasNext()) {
             Entry<String, BrokerLiveInfo> next = it.next();
             long last = next.getValue().getLastUpdateTimestamp();
+            //若长时间未被更新，关闭远程连接，从brokerLiveTable移除远程连接
             if ((last + BrokerChannelExpiredTime) < System.currentTimeMillis()) {
                 RemotingUtil.closeChannel(next.getValue().getChannel());
                 it.remove();

@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,6 +50,9 @@ public class NamesrvStartup {
     public static CommandLine commandLine = null;
 
     public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+        list.add("-p");
+        args = list.toArray(new String[0]);
         main0(args);
     }
 
@@ -56,20 +61,28 @@ public class NamesrvStartup {
 
 
         if (null == System.getProperty(NettySystemConfig.SystemPropertySocketSndbufSize)) {
+            //sender buffer size
             NettySystemConfig.socketSndbufSize = 4096;
         }
 
 
         if (null == System.getProperty(NettySystemConfig.SystemPropertySocketRcvbufSize)) {
+            //receiver buffer size
             NettySystemConfig.socketRcvbufSize = 4096;
         }
 
         try {
             //PackageConflictDetect.detectFastjson();
 
+            //build help namesrvAddr option
             Options options = ServerUtil.buildCommandlineOptions(new Options());
+            //主要是用来把入参，根据options转换为CommonLine
             commandLine =
-                    ServerUtil.parseCmdLine("mqnamesrv", args, buildCommandlineOptions(options),
+                    ServerUtil.parseCmdLine("mqnamesrv", args,
+                            //添加-c configFile option
+                            //添加 -p printConfigItem option
+                            buildCommandlineOptions(options),
+                            //新版本的commons.cli使用DefaultParser
                             new PosixParser());
             if (null == commandLine) {
                 System.exit(-1);
@@ -79,7 +92,9 @@ public class NamesrvStartup {
 
             final NamesrvConfig namesrvConfig = new NamesrvConfig();
             final NettyServerConfig nettyServerConfig = new NettyServerConfig();
+            //设置ServerBootStrap的监听端口为9876
             nettyServerConfig.setListenPort(9876);
+            //如果入参存在namesrv的config配置
             if (commandLine.hasOption('c')) {
                 String file = commandLine.getOptionValue('c');
                 if (file != null) {
@@ -100,9 +115,10 @@ public class NamesrvStartup {
                 System.exit(0);
             }
 
+            //把入参从CommonLine中拷贝到namesrvConfig中
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);
 
-            //set rocketmqhome
+            //set ROCKETMQ_HOME
             namesrvConfig.setRocketmqHome("D:\\IDEALearnSpace\\part2\\RocketMQ");
             if (null == namesrvConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
@@ -129,6 +145,7 @@ public class NamesrvStartup {
                 System.exit(-3);
             }
 
+            //关闭资源的shutdownHook
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 private volatile boolean hasShutdown = false;
                 private AtomicInteger shutdownTimes = new AtomicInteger(0);
@@ -149,7 +166,7 @@ public class NamesrvStartup {
                 }
             }, "ShutdownHook"));
 
-
+            //启动资源，主要就是启动NettyRemotingServer
             controller.start();
 
             String tip = "The Name Server boot success. serializeType=" + RemotingCommand.getSerializeTypeConfigInThisServer();

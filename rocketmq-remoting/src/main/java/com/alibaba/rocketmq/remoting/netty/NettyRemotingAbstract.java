@@ -78,6 +78,7 @@ public abstract class NettyRemotingAbstract {
         this.nettyEventExecuter.putNettyEvent(event);
     }
 
+    //处理消息接收
     public void processMessageReceived(ChannelHandlerContext ctx, RemotingCommand msg) throws Exception {
         final RemotingCommand cmd = msg;
         if (cmd != null) {
@@ -109,6 +110,7 @@ public abstract class NettyRemotingAbstract {
                             rpcHook.doBeforeRequest(RemotingHelper.parseChannelRemoteAddr(ctx.channel()), cmd);
                         }
 
+                        //把broker信息添加到RouteInfoManager中
                         final RemotingCommand response = pair.getObject1().processRequest(ctx, cmd);
                         if (rpcHook != null) {
                             rpcHook.doAfterResponse(RemotingHelper.parseChannelRemoteAddr(ctx.channel()), cmd, response);
@@ -406,10 +408,12 @@ public abstract class NettyRemotingAbstract {
         public void run() {
             plog.info(this.getServiceName() + " service started");
 
+            //获取的是子类提供的BrokerHousekeepingService
             final ChannelEventListener listener = NettyRemotingAbstract.this.getChannelEventListener();
 
             while (!this.isStoped()) {
                 try {
+                    //获取NettyEvent对象，如果3秒钟获取不到，继续执行
                     NettyEvent event = this.eventQueue.poll(3000, TimeUnit.MILLISECONDS);
                     if (event != null && listener != null) {
                         switch (event.getType()) {

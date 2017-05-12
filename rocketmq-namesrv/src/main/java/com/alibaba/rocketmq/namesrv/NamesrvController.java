@@ -46,6 +46,7 @@ public class NamesrvController {
 
     private final NettyServerConfig nettyServerConfig;
 
+    //会执行scanNotActiveBroker和printAllPeriodically定时任务
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(
             "NSScheduledThread"));
     private final KVConfigManager kvConfigManager;
@@ -53,6 +54,7 @@ public class NamesrvController {
 
     private RemotingServer remotingServer;
 
+    //用来处理channel的连接相关事件，例如channelActive等事件
     private BrokerHousekeepingService brokerHousekeepingService;
 
     private ExecutorService remotingExecutor;
@@ -72,15 +74,16 @@ public class NamesrvController {
         this.kvConfigManager.load();
 
 
+        //初始化ServerBootStrap的一些group信息
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
 
-
+        //ExecutorService，默认8线程
         this.remotingExecutor =
                 Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
 
         this.registerProcessor();
 
-
+        //scanNotActiveBroker，10秒循环一次
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override

@@ -64,9 +64,13 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
     private final NettyServerConfig nettyServerConfig;
 
     private final ExecutorService publicExecutor;
+
+    //BrokerHousekeepingService，处理onChannelIdle等事件
     private final ChannelEventListener channelEventListener;
 
     private final Timer timer = new Timer("ServerHouseKeepingService", true);
+
+    //本质上是ScheduledExecutorService，用来执行ServerBootStrap中的Handler中的方法的
     private DefaultEventExecutorGroup defaultEventExecutorGroup;
 
     private RPCHook rpcHook;
@@ -84,6 +88,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
         super(nettyServerConfig.getServerOnewaySemaphoreValue(), nettyServerConfig.getServerAsyncSemaphoreValue());
         this.serverBootstrap = new ServerBootstrap();
         this.nettyServerConfig = nettyServerConfig;
+        //被赋值BrokerHousekeepingService
         this.channelEventListener = channelEventListener;
 
         int publicThreadNums = nettyServerConfig.getServerCallbackExecutorThreads();
@@ -101,6 +106,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             }
         });
 
+        //ServerBootStrap的boss EventLoopGroup
         this.eventLoopGroupBoss = new NioEventLoopGroup(1, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
@@ -111,6 +117,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             }
         });
 
+        //根据平台环境，构建ServerBootStrap的worker EventLoopGroup
         if (RemotingUtil.isLinuxPlatform() //
                 && nettyServerConfig.isUseEpollNativeSelector()) {
             this.eventLoopGroupSelector = new EpollEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), new ThreadFactory() {
@@ -140,6 +147,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
 
     @Override
     public void start() {
+        //本质上是ScheduledExecutorService
         this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(//
                 nettyServerConfig.getServerWorkerThreads(), //
                 new ThreadFactory() {
@@ -153,6 +161,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
                     }
                 });
 
+        //ServerBootStrap绑定group和handler
         ServerBootstrap childHandler = //
                 this.serverBootstrap.group(this.eventLoopGroupBoss, this.eventLoopGroupSelector).channel(NioServerSocketChannel.class)
                         //
@@ -175,10 +184,13 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
                                 ch.pipeline().addLast(
                                         //
                                         defaultEventExecutorGroup, //
-                                        new NettyEncoder(), //
-                                        new NettyDecoder(), //
+                                        new NettyEncoder(), //编码器，把RemotingCommand编码为byte[]，会在前4位放入一个命令的byte长度
+                                        new NettyDecoder(), //解码器，继承自LengthFieldBasedFrameDecoder，前4位为长度字段，用于处理读半包
+                                        //当某一个channel既没有被读也没有被写达到指定时间，会触发IdleStateEvent事件，默认时间是120s
                                         new IdleStateHandler(0, 0, nettyServerConfig.getServerChannelMaxIdleTimeSeconds()), //
+                                        //主要处理channel连接相关的事件
                                         new NettyConnetManageHandler(), //
+                                        //处理事件的主handler
                                         new NettyServerHandler());
                             }
                         });
@@ -199,6 +211,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             this.nettyEventExecuter.start();
         }
 
+        //每秒执行scanResponseTable
         this.timer.scheduleAtFixedRate(new TimerTask() {
 
             @Override
@@ -260,7 +273,9 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
     }
 
     @Override
-    public void registerDefaultProcessor(NettyRequestProcessor processor, ExecutorService executor) {
+    public void registerDefaultProcessor(NettyRequestProcessor processor,  //DefaultRequestProcessor
+                                         //默认8线程ExecutorService
+                                         ExecutorService executor) {
         this.defaultRequestProcessor = new Pair<NettyRequestProcessor, ExecutorService>(processor, executor);
     }
 
@@ -339,6 +354,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             super.channelActive(ctx);
 
             if (NettyRemotingServer.this.channelEventListener != null) {
+                //其实这个地方最终是空实现，什么都没做
                 NettyRemotingServer.this.putNettyEvent(new NettyEvent(NettyEventType.CONNECT, remoteAddress.toString(), ctx.channel()));
             }
         }
@@ -351,11 +367,14 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             super.channelInactive(ctx);
 
             if (NettyRemotingServer.this.channelEventListener != null) {
+                //连接失效，会把channel从注册列表中移除
                 NettyRemotingServer.this.putNettyEvent(new NettyEvent(NettyEventType.CLOSE, remoteAddress.toString(), ctx.channel()));
             }
         }
 
 
+        //这个是因为长时间空闲引起的事件
+        //时间空闲过长（默认是120s），则断开连接
         @Override
         public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
             if (evt instanceof IdleStateEvent) {
