@@ -83,6 +83,7 @@ public class NamesrvController {
         this.remotingExecutor =
                 Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
 
+        //注册处理器，非常重要，netty接收到的事件主要就是靠注册的处理器来进行处理
         this.registerProcessor();
 
         //scanNotActiveBroker，10秒循环一次
@@ -107,12 +108,14 @@ public class NamesrvController {
 
 
     private void registerProcessor() {
+        //默认是false
         if (namesrvConfig.isClusterTest()) {
 
             this.remotingServer.registerDefaultProcessor(new ClusterTestRequestProcessor(this, namesrvConfig.getProductEnvName()),
                     this.remotingExecutor);
         } else {
-
+            //为remotingService注册默认的处理器，若监听到的事件找不到处理器，则使用此默认的处理器
+            //注册参数是处理器，并且对应的处理线程池，线程池用来执行Processor的操作
             this.remotingServer.registerDefaultProcessor(new DefaultRequestProcessor(this), this.remotingExecutor);
         }
     }

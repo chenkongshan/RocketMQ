@@ -96,6 +96,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             publicThreadNums = 4;
         }
 
+        //初始化线程为4的固定数量线程池，生产的线程前缀为 NettyServerPublicExecutor_
         this.publicExecutor = Executors.newFixedThreadPool(publicThreadNums, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
@@ -106,7 +107,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
             }
         });
 
-        //ServerBootStrap的boss EventLoopGroup
+        //ServerBootStrap的boss EventLoopGroup，boss线程数为1
         this.eventLoopGroupBoss = new NioEventLoopGroup(1, new ThreadFactory() {
             private AtomicInteger threadIndex = new AtomicInteger(0);
 
@@ -118,6 +119,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
         });
 
         //根据平台环境，构建ServerBootStrap的worker EventLoopGroup
+        //默认使用NioEventLoopGroup构建
         if (RemotingUtil.isLinuxPlatform() //
                 && nettyServerConfig.isUseEpollNativeSelector()) {
             this.eventLoopGroupSelector = new EpollEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), new ThreadFactory() {
@@ -131,6 +133,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
                 }
             });
         } else {
+            //构建worker线程池，线程数为3
             this.eventLoopGroupSelector = new NioEventLoopGroup(nettyServerConfig.getServerSelectorThreads(), new ThreadFactory() {
                 private AtomicInteger threadIndex = new AtomicInteger(0);
                 private int threadTotal = nettyServerConfig.getServerSelectorThreads();
@@ -149,7 +152,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
     public void start() {
         //本质上是ScheduledExecutorService
         this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(//
-                nettyServerConfig.getServerWorkerThreads(), //
+                nettyServerConfig.getServerWorkerThreads(), //8线程
                 new ThreadFactory() {
 
                     private AtomicInteger threadIndex = new AtomicInteger(0);

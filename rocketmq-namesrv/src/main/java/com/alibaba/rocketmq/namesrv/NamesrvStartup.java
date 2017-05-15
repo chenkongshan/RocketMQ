@@ -61,7 +61,10 @@ public class NamesrvStartup {
     }
 
     public static NamesrvController main0(String[] args) {
-        System.setProperty(RemotingCommand.RemotingVersionKey, Integer.toString(MQVersion.CurrentVersion));
+        //set "rocketmq.remoting.version"
+        System.setProperty(RemotingCommand.RemotingVersionKey,
+                //137 version V3_5_8
+                Integer.toString(MQVersion.CurrentVersion));
 
 
         if (null == System.getProperty(NettySystemConfig.SystemPropertySocketSndbufSize)) {

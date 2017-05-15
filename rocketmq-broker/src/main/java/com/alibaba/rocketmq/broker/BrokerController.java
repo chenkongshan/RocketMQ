@@ -162,8 +162,10 @@ public class BrokerController {
     public boolean initialize() throws CloneNotSupportedException {
         boolean result = true;
 
+        //从配置文件中加载topic信息
         result = result && this.topicConfigManager.load();
 
+        //加载offset信息
         result = result && this.consumerOffsetManager.load();
         result = result && this.subscriptionGroupManager.load();
 
@@ -213,6 +215,7 @@ public class BrokerController {
                     Executors.newFixedThreadPool(this.brokerConfig.getClientManageThreadPoolNums(), new ThreadFactoryImpl(
                             "ClientManageThread_"));
 
+            //这个非常重要，注册处理器
             this.registerProcessor();
 
 

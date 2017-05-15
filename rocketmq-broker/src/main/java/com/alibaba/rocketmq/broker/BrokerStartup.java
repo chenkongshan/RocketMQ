@@ -210,6 +210,7 @@ public class BrokerStartup {
                     break;
             }
 
+            //set port is 10912
             messageStoreConfig.setHaListenPort(nettyServerConfig.getListenPort() + 1);
 
             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
