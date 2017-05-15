@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -54,6 +56,13 @@ public class BrokerStartup {
     public static Logger log;
 
     public static void main(String[] args) {
+        List<String> list = new ArrayList<String>();
+        list.add("-n");
+        list.add("127.0.0.1:9876");
+        args = list.toArray(new String[0]);
+
+        //set rocketmq home
+        System.setProperty(MixAll.ROCKETMQ_HOME_PROPERTY, System.getProperty("user.dir"));
         start(createBrokerController(args));
     }
 
@@ -98,7 +107,7 @@ public class BrokerStartup {
 
             //PackageConflictDetect.detectFastjson();
 
-
+            //添加h“help”和n“namesrvAddr”的option
             Options options = ServerUtil.buildCommandlineOptions(new Options());
             commandLine =
                     ServerUtil.parseCmdLine("mqbroker", args, buildCommandlineOptions(options),
@@ -160,16 +169,13 @@ public class BrokerStartup {
 
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), brokerConfig);
 
-            brokerConfig.setRocketmqHome("D:\\IDEALearnSpace\\part2\\RocketMQ");
             if (null == brokerConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
                         + " variable in your environment to match the location of the RocketMQ installation");
                 System.exit(-2);
             }
 
-            brokerConfig.setNamesrvAddr("127.0.0.1:9876");
             String namesrvAddr = brokerConfig.getNamesrvAddr();
-            System.out.println("namesrv:" + namesrvAddr);
             if (null != namesrvAddr) {
                 try {
                     String[] addrArray = namesrvAddr.split(";");

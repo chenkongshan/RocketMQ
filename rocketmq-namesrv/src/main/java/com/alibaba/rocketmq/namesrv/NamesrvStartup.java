@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.namesrv;
 
@@ -26,6 +26,7 @@ import com.alibaba.rocketmq.remoting.netty.NettyServerConfig;
 import com.alibaba.rocketmq.remoting.netty.NettySystemConfig;
 import com.alibaba.rocketmq.remoting.protocol.RemotingCommand;
 import com.alibaba.rocketmq.srvutil.ServerUtil;
+import com.alibaba.rocketmq.tools.path.ProjectPath;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -52,7 +53,10 @@ public class NamesrvStartup {
     public static void main(String[] args) {
         List<String> list = new ArrayList<String>();
         list.add("-p");
-        args = list.toArray(new String[0]);
+        //args = list.toArray(new String[0]);
+
+        //set rocketmq home
+        System.setProperty(MixAll.ROCKETMQ_HOME_PROPERTY, ProjectPath.getRoot());
         main0(args);
     }
 
@@ -118,8 +122,6 @@ public class NamesrvStartup {
             //把入参从CommonLine中拷贝到namesrvConfig中
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), namesrvConfig);
 
-            //set ROCKETMQ_HOME
-            namesrvConfig.setRocketmqHome("D:\\IDEALearnSpace\\part2\\RocketMQ");
             if (null == namesrvConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
                         + " variable in your environment to match the location of the RocketMQ installation");
@@ -139,6 +141,7 @@ public class NamesrvStartup {
 
 
             final NamesrvController controller = new NamesrvController(namesrvConfig, nettyServerConfig);
+            //Controller初始化
             boolean initResult = controller.initialize();
             if (!initResult) {
                 controller.shutdown();

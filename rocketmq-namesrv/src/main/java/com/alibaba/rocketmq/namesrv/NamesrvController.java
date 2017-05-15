@@ -64,7 +64,9 @@ public class NamesrvController {
         this.namesrvConfig = namesrvConfig;
         this.nettyServerConfig = nettyServerConfig;
         this.kvConfigManager = new KVConfigManager(this);
+        //路由信息管理类
         this.routeInfoManager = new RouteInfoManager();
+        //处理channel链接相关事件类
         this.brokerHousekeepingService = new BrokerHousekeepingService(this);
     }
 
