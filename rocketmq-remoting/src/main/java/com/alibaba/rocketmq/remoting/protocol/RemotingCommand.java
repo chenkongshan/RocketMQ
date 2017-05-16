@@ -460,7 +460,8 @@ public class RemotingCommand {
 
     @JSONField(serialize = false)
     public boolean isOnewayRPC() {
-        int bits = 1 << RPC_ONEWAY;
+        //主要是看flag的从右边第二位，若为1并且末尾为0，则是isOnewayRPC
+        int bits = 1 << RPC_ONEWAY;  //bits = 0010
         return (this.flag & bits) == bits;
     }
 
@@ -474,6 +475,7 @@ public class RemotingCommand {
 
     @JSONField(serialize = false)
     public RemotingCommandType getType() {
+        //flag末尾为1，则为response，为0则为request
         if (this.isResponseType()) {
             return RemotingCommandType.RESPONSE_COMMAND;
         }

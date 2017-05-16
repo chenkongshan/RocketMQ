@@ -59,10 +59,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class NettyRemotingServer extends NettyRemotingAbstract implements RemotingServer {
     private static final Logger log = LoggerFactory.getLogger(RemotingHelper.RemotingLogName);
     private final ServerBootstrap serverBootstrap;
-    private final EventLoopGroup eventLoopGroupSelector;
-    private final EventLoopGroup eventLoopGroupBoss;
+    private final EventLoopGroup eventLoopGroupSelector;  //worker
+    private final EventLoopGroup eventLoopGroupBoss;  //boss
     private final NettyServerConfig nettyServerConfig;
 
+    //4线程FixedThreadPoole
     private final ExecutorService publicExecutor;
 
     //BrokerHousekeepingService，处理onChannelIdle等事件
@@ -150,7 +151,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
 
     @Override
     public void start() {
-        //本质上是ScheduledExecutorService
+        //本质上是ScheduledExecutorService，用来执行handler的方法
         this.defaultEventExecutorGroup = new DefaultEventExecutorGroup(//
                 nettyServerConfig.getServerWorkerThreads(), //8线程
                 new ThreadFactory() {
@@ -191,7 +192,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
                                         new NettyDecoder(), //解码器，继承自LengthFieldBasedFrameDecoder，前4位为长度字段，用于处理读半包
                                         //当某一个channel既没有被读也没有被写达到指定时间，会触发IdleStateEvent事件，默认时间是120s
                                         new IdleStateHandler(0, 0, nettyServerConfig.getServerChannelMaxIdleTimeSeconds()), //
-                                        //主要处理channel连接相关的事件
+                                        //主要处理channel连接相关的事件，把监听到的channel连接事件封装成NettyEvent，然后丢到nettyEventExecutor的等待队列中
                                         new NettyConnetManageHandler(), //
                                         //处理事件的主handler
                                         new NettyServerHandler());
@@ -211,6 +212,7 @@ public class NettyRemotingServer extends NettyRemotingAbstract implements Remoti
         }
 
         if (this.channelEventListener != null) {
+            //是一个线程，内部有一个LinkedBlockingQueue，接收NettyEvent，主要就是用来处理channel的连接事件，如IDLE,CLOSE,CONNECT,EXCEPTION
             this.nettyEventExecuter.start();
         }
 

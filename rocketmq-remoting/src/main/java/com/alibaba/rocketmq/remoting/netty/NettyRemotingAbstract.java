@@ -116,6 +116,7 @@ public abstract class NettyRemotingAbstract {
                             rpcHook.doAfterResponse(RemotingHelper.parseChannelRemoteAddr(ctx.channel()), cmd, response);
                         }
 
+                        //cmd中的flag字段，从右边开始第二位为1，末位为0，才是onewayRPC
                         if (!cmd.isOnewayRPC()) {
                             if (response != null) {
                                 response.setOpaque(opaque);

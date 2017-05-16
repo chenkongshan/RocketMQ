@@ -57,6 +57,7 @@ public class NamesrvController {
     //用来处理channel的连接相关事件，例如channelActive等事件
     private BrokerHousekeepingService brokerHousekeepingService;
 
+    //8线程FixedThreadPool，用来执行RemotingServer的默认Processor
     private ExecutorService remotingExecutor;
 
 
@@ -79,7 +80,7 @@ public class NamesrvController {
         //初始化ServerBootStrap的一些group信息
         this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.brokerHousekeepingService);
 
-        //ExecutorService，默认8线程
+        //ExecutorService，默认8线程，用来执行RemotingServer的默认Processor的
         this.remotingExecutor =
                 Executors.newFixedThreadPool(nettyServerConfig.getServerWorkerThreads(), new ThreadFactoryImpl("RemotingExecutorThread_"));
 
