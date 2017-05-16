@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.remoting.protocol;
 
@@ -166,8 +166,11 @@ public class RemotingCommand {
     }
 
     public static RemotingCommand decode(final ByteBuffer byteBuffer) {
+        //为数据的总长度，即headerLength.length(4) + header.length + body.length
         int length = byteBuffer.limit();
+        //headerLength,include serializeType at first byte
         int oriHeaderLen = byteBuffer.getInt();
+        //真正的headerLength
         int headerLength = getHeaderLength(oriHeaderLen);
 
         byte[] headerData = new byte[headerLength];
@@ -187,6 +190,7 @@ public class RemotingCommand {
     }
 
     public static int getHeaderLength(int length) {
+        //一个整数型，只有后3个字节记录的是header的长度，第一个字节记录的是serializeType
         return length & 0xFFFFFF;
     }
 
@@ -379,10 +383,22 @@ public class RemotingCommand {
         }
     }
 
+    /**
+     * 把目标int存放到一个4位长度的byte数组中，0位存放序列化类型，后3位存放int数值
+     * 因此，最大存放值为0xFFFFFF，超过此最大值，无法准确记录
+     * 经过计算，int资源可以存储的最大值为16MB
+     *
+     * @param source
+     * @param type
+     * @return
+     */
     public static byte[] markProtocolType(int source, SerializeType type) {
         byte[] result = new byte[4];
 
+        //0位存放序列化类型，默认是JSON
         result[0] = type.getCode();
+        //1位存放int资源的第二byte的8位
+        //使用0xFF &操作的好处是，只取目标8位值
         result[1] = (byte) ((source >> 16) & 0xFF);
         result[2] = (byte) ((source >> 8) & 0xFF);
         result[3] = (byte) (source & 0xFF);
@@ -422,7 +438,9 @@ public class RemotingCommand {
     }
 
     /**
-
+     * ************4位*********4位
+     * protocol:totalLength headerLength headerData body
+     * totalLength = headerLength.length + headerData.length + body.length
      */
     public ByteBuffer encodeHeader(final int bodyLength) {
         // 1> header length size
@@ -439,10 +457,13 @@ public class RemotingCommand {
 
         ByteBuffer result = ByteBuffer.allocate(4 + length - bodyLength);
 
+        //totalLength的长度为4位，这个长度是不算做数据总长度里面的，
+        // 因为后面会有LengthFieldBasedFrameDecoder来根据totalLength进行解析
         // length
         result.putInt(length);
 
         // header length
+        //4位byte数组，0位存放序列化类型，后面3位存放header的length，因此header的最大长度位0xFFFFFF
         result.put(markProtocolType(headerData.length, serializeTypeCurrentRPC));
 
         // header data
