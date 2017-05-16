@@ -52,7 +52,7 @@ public class NamesrvStartup {
 
     public static void main(String[] args) {
         List<String> list = new ArrayList<String>();
-        list.add("-p");
+        //list.add("-p");
         //args = list.toArray(new String[0]);
 
         //set rocketmq home
