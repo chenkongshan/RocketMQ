@@ -98,7 +98,9 @@ public class DefaultMessageStore implements MessageStore {
 
 
     public DefaultMessageStore(final MessageStoreConfig messageStoreConfig, final BrokerStatsManager brokerStatsManager,
-                               final MessageArrivingListener messageArrivingListener, final BrokerConfig brokerConfig) throws IOException {
+                               //NotifyMessageArrivingListener
+                               final MessageArrivingListener messageArrivingListener,
+                               final BrokerConfig brokerConfig) throws IOException {
         this.messageArrivingListener = messageArrivingListener;
         this.brokerConfig = brokerConfig;
         this.messageStoreConfig = messageStoreConfig;
@@ -121,6 +123,7 @@ public class DefaultMessageStore implements MessageStore {
 
         this.allocateMapedFileService.start();
 
+        //空实现....
         this.indexService.start();
     }
 
@@ -1164,6 +1167,7 @@ public class DefaultMessageStore implements MessageStore {
     }
 
     private boolean loadConsumeQueue() {
+        //root/consumequeue
         File dirLogic = new File(StorePathConfigHelper.getStorePathConsumeQueue(this.messageStoreConfig.getStorePathRootDir()));
         File[] fileTopicList = dirLogic.listFiles();
         if (fileTopicList != null) {
@@ -1183,6 +1187,7 @@ public class DefaultMessageStore implements MessageStore {
                         ConsumeQueue logic = new ConsumeQueue(//
                                 topic, //
                                 queueId, //
+                                //root/consumequeue
                                 StorePathConfigHelper.getStorePathConsumeQueue(this.messageStoreConfig.getStorePathRootDir()), //
                                 this.getMessageStoreConfig().getMapedFileSizeConsumeQueue(), //
                                 this);

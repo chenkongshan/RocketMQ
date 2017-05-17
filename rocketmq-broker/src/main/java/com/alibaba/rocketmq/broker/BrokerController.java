@@ -78,6 +78,7 @@ public class BrokerController {
     private final ClientHousekeepingService clientHousekeepingService;
     private final PullMessageProcessor pullMessageProcessor;
     private final PullRequestHoldService pullRequestHoldService;
+    //NotifyMessageArrivingListener
     private final MessageArrivingListener messageArrivingListener;
     private final Broker2Client broker2Client;
     private final SubscriptionGroupManager subscriptionGroupManager;
@@ -172,7 +173,9 @@ public class BrokerController {
         if (result) {
             try {
                 this.messageStore =
-                        new DefaultMessageStore(this.messageStoreConfig, this.brokerStatsManager, this.messageArrivingListener,
+                        new DefaultMessageStore(this.messageStoreConfig, this.brokerStatsManager,
+                                //NotifyMessageArrivingListener
+                                this.messageArrivingListener,
                                 this.brokerConfig);
                 this.brokerStats = new BrokerStats((DefaultMessageStore) this.messageStore);
                 //load plugin

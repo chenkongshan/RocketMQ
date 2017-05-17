@@ -178,11 +178,14 @@ public class ScheduleMessageService extends ConfigManager {
         timeUnitTable.put("h", 1000L * 60 * 60);
         timeUnitTable.put("d", 1000L * 60 * 60 * 24);
 
+        //default "1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h"
         String levelString = this.defaultMessageStore.getMessageStoreConfig().getMessageDelayLevel();
         try {
             String[] levelArray = levelString.split(" ");
             for (int i = 0; i < levelArray.length; i++) {
+                //eg 1s
                 String value = levelArray[i];
+                //sub s m h d
                 String ch = value.substring(value.length() - 1);
                 Long tu = timeUnitTable.get(ch);
 
@@ -192,6 +195,7 @@ public class ScheduleMessageService extends ConfigManager {
                 }
                 long num = Long.parseLong(value.substring(0, value.length() - 1));
                 long delayTimeMillis = tu * num;
+                //total level 18
                 this.delayLevelTable.put(level, delayTimeMillis);
             }
         } catch (Exception e) {

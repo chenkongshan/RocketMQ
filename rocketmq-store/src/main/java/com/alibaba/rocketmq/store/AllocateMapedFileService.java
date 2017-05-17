@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class AllocateMapedFileService extends ServiceThread {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.StoreLoggerName);
     private static int WaitTimeOut = 1000 * 5;
-    private ConcurrentHashMap<String, AllocateRequest> requestTable =
+    private ConcurrentHashMap<String/*filePath*/, AllocateRequest> requestTable =
             new ConcurrentHashMap<String, AllocateRequest>();
     private PriorityBlockingQueue<AllocateRequest> requestQueue =
             new PriorityBlockingQueue<AllocateRequest>();
@@ -165,8 +165,8 @@ public class AllocateMapedFileService extends ServiceThread {
 
                 // pre write mappedFile
                 if (mapedFile.getFileSize() >= this.messageStore.getMessageStoreConfig()
-                        .getMapedFileSizeCommitLog() //
-                        && //
+                        .getMapedFileSizeCommitLog() // size is 1G
+                        && //isWarmMapedFileEnable默认值是false
                         this.messageStore.getMessageStoreConfig().isWarmMapedFileEnable()) {
                     mapedFile.warmMappedFile(this.messageStore.getMessageStoreConfig().getFlushDiskType(),
                             this.messageStore.getMessageStoreConfig().getFlushLeastPagesWhenWarmMapedFile());
