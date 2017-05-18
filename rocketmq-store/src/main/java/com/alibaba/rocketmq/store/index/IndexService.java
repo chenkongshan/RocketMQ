@@ -56,6 +56,8 @@ public class IndexService {
         this.hashSlotNum = store.getMessageStoreConfig().getMaxHashSlotNum();
         //default 5000000 * 4
         this.indexNum = store.getMessageStoreConfig().getMaxIndexNum();
+
+        //root/index
         this.storePath =
                 StorePathConfigHelper.getStorePathIndex(store.getMessageStoreConfig().getStorePathRootDir());
     }

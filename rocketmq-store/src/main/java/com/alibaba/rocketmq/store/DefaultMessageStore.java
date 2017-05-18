@@ -148,6 +148,7 @@ public class DefaultMessageStore implements MessageStore {
         boolean result = true;
 
         try {
+            //判断是否存在root/abort，存在说明未正常退出
             boolean lastExitOK = !this.isTempFileExist();
             log.info("last shutdown {}", (lastExitOK ? "normally" : "abnormally"));
 

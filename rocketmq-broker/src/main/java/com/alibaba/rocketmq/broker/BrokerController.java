@@ -192,14 +192,15 @@ public class BrokerController {
         if (result) {
             this.remotingServer = new NettyRemotingServer(this.nettyServerConfig, this.clientHousekeepingService);
             NettyServerConfig fastConfig = (NettyServerConfig) this.nettyServerConfig.clone();
+            //10911-2=10909
             fastConfig.setListenPort(nettyServerConfig.getListenPort() - 2);
             this.fastRemotingServer = new NettyRemotingServer(fastConfig, this.clientHousekeepingService);
             this.sendMessageExecutor = new BrokerFixedThreadPoolExecutor(//
-                    this.brokerConfig.getSendMessageThreadPoolNums(),//
+                    this.brokerConfig.getSendMessageThreadPoolNums(),// default 16 + Runtime.getRuntime().availableProcessors() * 4
                     this.brokerConfig.getSendMessageThreadPoolNums(),//
                     1000 * 60,//
                     TimeUnit.MILLISECONDS,//
-                    this.sendThreadPoolQueue,//
+                    this.sendThreadPoolQueue,//default size 10000
                     new ThreadFactoryImpl("SendMessageThread_"));
 
             this.pullMessageExecutor = new BrokerFixedThreadPoolExecutor(//
