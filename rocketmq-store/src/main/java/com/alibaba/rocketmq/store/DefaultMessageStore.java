@@ -1531,8 +1531,10 @@ public class DefaultMessageStore implements MessageStore {
 
 
         private void doFlush(int retryTimes) {
+            //default 2
             int flushConsumeQueueLeastPages = DefaultMessageStore.this.getMessageStoreConfig().getFlushConsumeQueueLeastPages();
 
+            //normally retryTimes is 1
             if (retryTimes == RetryTimesOver) {
                 flushConsumeQueueLeastPages = 0;
             }
@@ -1540,6 +1542,7 @@ public class DefaultMessageStore implements MessageStore {
             long logicsMsgTimestamp = 0;
 
 
+            //default 1000 * 60
             int flushConsumeQueueThoroughInterval = DefaultMessageStore.this.getMessageStoreConfig().getFlushConsumeQueueThoroughInterval();
             long currentTimeMillis = System.currentTimeMillis();
             if (currentTimeMillis >= (this.lastFlushTimestamp + flushConsumeQueueThoroughInterval)) {
@@ -1548,6 +1551,7 @@ public class DefaultMessageStore implements MessageStore {
                 logicsMsgTimestamp = DefaultMessageStore.this.getStoreCheckpoint().getLogicsMsgTimestamp();
             }
 
+            //ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* queueId */, ConsumeQueue>>
             ConcurrentHashMap<String, ConcurrentHashMap<Integer, ConsumeQueue>> tables = DefaultMessageStore.this.consumeQueueTable;
 
             for (ConcurrentHashMap<Integer, ConsumeQueue> maps : tables.values()) {
@@ -1573,6 +1577,7 @@ public class DefaultMessageStore implements MessageStore {
 
             while (!this.isStoped()) {
                 try {
+                    //default 1000
                     int interval = DefaultMessageStore.this.getMessageStoreConfig().getFlushIntervalConsumeQueue();
                     this.waitForRunning(interval);
                     this.doFlush(1);
