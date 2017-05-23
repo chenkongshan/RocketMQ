@@ -122,22 +122,23 @@ public class BrokerStartup {
             final NettyServerConfig nettyServerConfig = new NettyServerConfig();
             final NettyClientConfig nettyClientConfig = new NettyClientConfig();
             nettyServerConfig.setListenPort(10911);
+            //消息存储服务配置项
             final MessageStoreConfig messageStoreConfig = new MessageStoreConfig();
 
-
+            //从broker配置，暂时不看
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;
                 messageStoreConfig.setAccessMessageInMemoryMaxRatio(ratio);
             }
 
-
+            //打印配置项信息
             if (commandLine.hasOption('p')) {
                 MixAll.printObjectProperties(null, brokerConfig);
                 MixAll.printObjectProperties(null, nettyServerConfig);
                 MixAll.printObjectProperties(null, nettyClientConfig);
                 MixAll.printObjectProperties(null, messageStoreConfig);
                 System.exit(0);
-            } else if (commandLine.hasOption('m')) {
+            } else if (commandLine.hasOption('m')) {  //只打印重要配置项信息ImportantField
                 MixAll.printObjectProperties(null, brokerConfig, true);
                 MixAll.printObjectProperties(null, nettyServerConfig, true);
                 MixAll.printObjectProperties(null, nettyClientConfig, true);
@@ -145,7 +146,7 @@ public class BrokerStartup {
                 System.exit(0);
             }
 
-
+            //读取配置项，因此可以通过配置文件改变配置项brokerConfig,nettyServerConfig,nettyClientConfig,messageStoreConfig
             if (commandLine.hasOption('c')) {
                 String file = commandLine.getOptionValue('c');
                 if (file != null) {
@@ -167,14 +168,17 @@ public class BrokerStartup {
                 }
             }
 
+            //把运行命令后面携带的入参，添加到brokerConfig配置项中
             MixAll.properties2Object(ServerUtil.commandLine2Properties(commandLine), brokerConfig);
 
+            //一般在linux环境下，会配置ROCKETMQ_HOME环境变量
             if (null == brokerConfig.getRocketmqHome()) {
                 System.out.println("Please set the " + MixAll.ROCKETMQ_HOME_ENV
                         + " variable in your environment to match the location of the RocketMQ installation");
                 System.exit(-2);
             }
 
+            //可能存在多个namesrv的地址，类是ip:port;ip:port
             String namesrvAddr = brokerConfig.getNamesrvAddr();
             if (null != namesrvAddr) {
                 try {
@@ -194,9 +198,11 @@ public class BrokerStartup {
             }
 
 
+            //默认是ASYNC_MASTER异步主broker
             switch (messageStoreConfig.getBrokerRole()) {
                 case ASYNC_MASTER:
                 case SYNC_MASTER:
+                    //master broker则设置brokerId为0，非0的都是slave broker
                     brokerConfig.setBrokerId(MixAll.MASTER_ID);
                     break;
                 case SLAVE:

@@ -50,7 +50,7 @@ public class TopicConfigManager extends ConfigManager {
     private static final long LockTimeoutMillis = 3000;
     private transient final Lock lockTopicConfigTable = new ReentrantLock();
 
-    private final ConcurrentHashMap<String, TopicConfig> topicConfigTable =
+    private final ConcurrentHashMap<String/*topicName*/, TopicConfig> topicConfigTable =
             new ConcurrentHashMap<String, TopicConfig>(1024);
     private final DataVersion dataVersion = new DataVersion();
     private final Set<String> systemTopicList = new HashSet<String>();
@@ -74,10 +74,12 @@ public class TopicConfigManager extends ConfigManager {
         }
         {
             // MixAll.DEFAULT_TOPIC
+            //autoCreateTopicEnable默认是开启的，可以通过配置项关闭
             if (this.brokerController.getBrokerConfig().isAutoCreateTopicEnable()) {
                 String topic = MixAll.DEFAULT_TOPIC;
                 TopicConfig topicConfig = new TopicConfig(topic);
                 this.systemTopicList.add(topic);
+                //defaultTopicQueueNums默认为8
                 topicConfig.setReadQueueNums(this.brokerController.getBrokerConfig()
                         .getDefaultTopicQueueNums());
                 topicConfig.setWriteQueueNums(this.brokerController.getBrokerConfig()
@@ -97,11 +99,12 @@ public class TopicConfigManager extends ConfigManager {
             this.topicConfigTable.put(topicConfig.getTopicName(), topicConfig);
         }
         {
-
+            //DefaultCluster
             String topic = this.brokerController.getBrokerConfig().getBrokerClusterName();
             TopicConfig topicConfig = new TopicConfig(topic);
             this.systemTopicList.add(topic);
             int perm = PermName.PERM_INHERIT;
+            //clusterTopicEnable默认是true
             if (this.brokerController.getBrokerConfig().isClusterTopicEnable()) {
                 perm |= PermName.PERM_READ | PermName.PERM_WRITE;
             }
@@ -114,6 +117,7 @@ public class TopicConfigManager extends ConfigManager {
             TopicConfig topicConfig = new TopicConfig(topic);
             this.systemTopicList.add(topic);
             int perm = PermName.PERM_INHERIT;
+            //brokerTopicEnable默认是true
             if (this.brokerController.getBrokerConfig().isBrokerTopicEnable()) {
                 perm |= PermName.PERM_READ | PermName.PERM_WRITE;
             }

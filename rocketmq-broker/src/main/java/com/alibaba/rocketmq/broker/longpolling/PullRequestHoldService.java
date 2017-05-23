@@ -74,6 +74,7 @@ public class PullRequestHoldService extends ServiceThread {
         log.info(this.getServiceName() + " service started");
         while (!this.isStoped()) {
             try {
+                //longPollingEnable默认是true
                 if (this.brokerController.getBrokerConfig().isLongPollingEnable()) {
                     this.waitForRunning(10 * 1000);
                 } else {

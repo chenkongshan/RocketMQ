@@ -117,11 +117,16 @@ public class BrokerController {
         this.nettyServerConfig = nettyServerConfig;
         this.nettyClientConfig = nettyClientConfig;
         this.messageStoreConfig = messageStoreConfig;
+        //继承自ConfigManager，可以读取配置项
         this.consumerOffsetManager = new ConsumerOffsetManager(this);
+        //继承自ConfigManager，可以读取配置项
         this.topicConfigManager = new TopicConfigManager(this);
+        //implementing NettyRequestProcessor，是一个netty请求处理器
         this.pullMessageProcessor = new PullMessageProcessor(this);
+        //继承自ServiceThread，可以自启动，类似于FixedThreadPool
         this.pullRequestHoldService = new PullRequestHoldService(this);
         this.messageArrivingListener = new NotifyMessageArrivingListener(this.pullRequestHoldService);
+        //TODO 看到这里
         this.consumerIdsChangeListener = new DefaultConsumerIdsChangeListener(this);
         this.consumerManager = new ConsumerManager(this.consumerIdsChangeListener);
         this.producerManager = new ProducerManager();
