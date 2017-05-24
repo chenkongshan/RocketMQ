@@ -126,30 +126,41 @@ public class BrokerController {
         //继承自ServiceThread，可以自启动，类似于FixedThreadPool
         this.pullRequestHoldService = new PullRequestHoldService(this);
         this.messageArrivingListener = new NotifyMessageArrivingListener(this.pullRequestHoldService);
-        //TODO 看到这里
+        //主要实现方法consumerIdsChanged(String group, List<Channel> channels)
         this.consumerIdsChangeListener = new DefaultConsumerIdsChangeListener(this);
+        //消费者管理器ConcurrentHashMap<String/* Group */, ConsumerGroupInfo> consumerTable存储消费者容器
         this.consumerManager = new ConsumerManager(this.consumerIdsChangeListener);
+        //生产者管理器
         this.producerManager = new ProducerManager();
+        //implementing ChannelEventListener，用于管理客户端连接事件
         this.clientHousekeepingService = new ClientHousekeepingService(this);
         this.broker2Client = new Broker2Client(this);
+        //继承自ConfigManager，主要容器ConcurrentHashMap<String/*groupName*/, SubscriptionGroupConfig> subscriptionGroupTable
         this.subscriptionGroupManager = new SubscriptionGroupManager(this);
+        //主要是操作NettyRemotingClient
         this.brokerOuterAPI = new BrokerOuterAPI(nettyClientConfig);
+        //内置了一个ScheduledExecutorService，可以启动定时任务
         this.filterServerManager = new FilterServerManager(this);
 
         if (this.brokerConfig.getNamesrvAddr() != null) {
+            //NettyRemotingClient的namesrvAddr列表被修改为指定的地址
             this.brokerOuterAPI.updateNameServerAddressList(this.brokerConfig.getNamesrvAddr());
             log.info("user specfied name server address: {}", this.brokerConfig.getNamesrvAddr());
         }
 
+        //应该是从broker的同步管理
         this.slaveSynchronize = new SlaveSynchronize(this);
 
+        //默认大小是10000
         this.sendThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getSendThreadPoolQueueCapacity());
-
+        //默认大小是10000
         this.pullThreadPoolQueue = new LinkedBlockingQueue<Runnable>(this.brokerConfig.getPullThreadPoolQueueCapacity());
 
+        //stats[stæts]“统计”，采集并打印统计信息
         this.brokerStatsManager = new BrokerStatsManager(this.brokerConfig.getBrokerClusterName());
+        //本地IP:10911
         this.setStoreHost(new InetSocketAddress(this.getBrokerConfig().getBrokerIP1(), this.getNettyServerConfig().getListenPort()));
-
+        //todo view here
         this.brokerFastFailure = new BrokerFastFailure(this);
     }
 

@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SubscriptionGroupManager extends ConfigManager {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.BrokerLoggerName);
 
-    private final ConcurrentHashMap<String, SubscriptionGroupConfig> subscriptionGroupTable =
+    private final ConcurrentHashMap<String/*groupName*/, SubscriptionGroupConfig> subscriptionGroupTable =
             new ConcurrentHashMap<String, SubscriptionGroupConfig>(1024);
     private final DataVersion dataVersion = new DataVersion();
     private transient BrokerController brokerController;

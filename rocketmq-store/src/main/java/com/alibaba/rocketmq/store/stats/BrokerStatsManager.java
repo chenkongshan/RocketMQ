@@ -43,7 +43,7 @@ public class BrokerStatsManager {
     public static final String GROUP_GET_FROM_DISK_SIZE = "GROUP_GET_FROM_DISK_SIZE";
     public static final String BROKER_GET_FROM_DISK_NUMS = "BROKER_GET_FROM_DISK_NUMS";
     public static final String BROKER_GET_FROM_DISK_SIZE = "BROKER_GET_FROM_DISK_SIZE";
-    // For commercial
+    // For commercial [kəˈmɜ:rʃl]商业的
     public static final String COMMERCIAL_SEND_TIMES = "COMMERCIAL_SEND_TIMES";
     public static final String COMMERCIAL_SNDBCK_TIMES = "COMMERCIAL_SNDBCK_TIMES";
     public static final String COMMERCIAL_RCV_TIMES = "COMMERCIAL_RCV_TIMES";
@@ -81,7 +81,7 @@ public class BrokerStatsManager {
         this.statsTable.put(TOPIC_PUT_SIZE, new StatsItemSet(TOPIC_PUT_SIZE, this.scheduledExecutorService, log));
         this.statsTable.put(GROUP_GET_NUMS, new StatsItemSet(GROUP_GET_NUMS, this.scheduledExecutorService, log));
         this.statsTable.put(GROUP_GET_SIZE, new StatsItemSet(GROUP_GET_SIZE, this.scheduledExecutorService, log));
-        this.statsTable.put(GROUP_GET_LATENCY, new StatsItemSet(GROUP_GET_LATENCY, this.scheduledExecutorService, log));
+        this.statsTable.put(GROUP_GET_LATENCY/* [ˈletn:si] 延迟*/, new StatsItemSet(GROUP_GET_LATENCY, this.scheduledExecutorService, log));
         this.statsTable.put(SNDBCK_PUT_NUMS, new StatsItemSet(SNDBCK_PUT_NUMS, this.scheduledExecutorService, log));
         this.statsTable.put(BROKER_PUT_NUMS, new StatsItemSet(BROKER_PUT_NUMS, this.scheduledExecutorService, log));
         this.statsTable.put(BROKER_GET_NUMS, new StatsItemSet(BROKER_GET_NUMS, this.scheduledExecutorService, log));
