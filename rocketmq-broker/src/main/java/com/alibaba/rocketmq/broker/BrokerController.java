@@ -143,7 +143,7 @@ public class BrokerController {
         this.filterServerManager = new FilterServerManager(this);
 
         if (this.brokerConfig.getNamesrvAddr() != null) {
-            //NettyRemotingClient的namesrvAddr列表被修改为指定的地址
+            //NettyRemotingClient的namesrvAddr列表被修改为指定的地址,就是前面指定的namesrv的地址
             this.brokerOuterAPI.updateNameServerAddressList(this.brokerConfig.getNamesrvAddr());
             log.info("user specfied name server address: {}", this.brokerConfig.getNamesrvAddr());
         }
@@ -160,7 +160,7 @@ public class BrokerController {
         this.brokerStatsManager = new BrokerStatsManager(this.brokerConfig.getBrokerClusterName());
         //本地IP:10911
         this.setStoreHost(new InetSocketAddress(this.getBrokerConfig().getBrokerIP1(), this.getNettyServerConfig().getListenPort()));
-        //todo view here
+        //内部存在一个ScheduledExecutorService，可以启动定时任务
         this.brokerFastFailure = new BrokerFastFailure(this);
     }
 
@@ -180,10 +180,13 @@ public class BrokerController {
         boolean result = true;
 
         //从配置文件中加载topic信息
+        //ConcurrentHashMap<String/*topicName*/, TopicConfig> topicConfigTable
         result = result && this.topicConfigManager.load();
 
         //加载offset信息
+        //ConcurrentHashMap<String/* topic@group */, ConcurrentHashMap<Integer, Long>> offsetTable
         result = result && this.consumerOffsetManager.load();
+        //ConcurrentHashMap<String/*groupName*/, SubscriptionGroupConfig> subscriptionGroupTable
         result = result && this.subscriptionGroupManager.load();
 
         if (result) {

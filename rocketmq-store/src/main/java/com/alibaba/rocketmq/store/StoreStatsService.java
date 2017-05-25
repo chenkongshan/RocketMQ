@@ -36,7 +36,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class StoreStatsService extends ServiceThread {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.StoreLoggerName);
 
-    private static final int FrequencyOfSampling = 1000;
+    private static final int FrequencyOfSampling = 1000; //[ˈfrikwənsi] 频率
 
     private static final int MaxRecordsOfSampling = 60 * 10;
     private static final String[] PutMessageEntireTimeMaxDesc = new String[]{

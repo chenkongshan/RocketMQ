@@ -63,9 +63,12 @@ public class HAService {
 
     public HAService(final DefaultMessageStore defaultMessageStore) throws IOException {
         this.defaultMessageStore = defaultMessageStore;
+        //继承自ServiceThread
         this.acceptSocketService =
-                new AcceptSocketService(defaultMessageStore.getMessageStoreConfig().getHaListenPort());
+                new AcceptSocketService(defaultMessageStore.getMessageStoreConfig().getHaListenPort());//port 10912
+        //继承自ServiceThread
         this.groupTransferService = new GroupTransferService();
+        //继承自ServiceThread
         this.haClient = new HAClient();
     }
 

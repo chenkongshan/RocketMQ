@@ -105,22 +105,27 @@ public class DefaultMessageStore implements MessageStore {
         this.brokerConfig = brokerConfig;
         this.messageStoreConfig = messageStoreConfig;
         this.brokerStatsManager = brokerStatsManager;
-        this.allocateMapedFileService = new AllocateMapedFileService(this);
+        //继承自ServiceThread
+        this.allocateMapedFileService = new AllocateMapedFileService(this);// [ˈæləˌket]
         this.commitLog = new CommitLog(this);
         this.consumeQueueTable = new ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* queueId */, ConsumeQueue>>(32);
 
+        //继承自ServiceThread
         this.flushConsumeQueueService = new FlushConsumeQueueService();
         this.cleanCommitLogService = new CleanCommitLogService();
         this.cleanConsumeQueueService = new CleanConsumeQueueService();
+        //继承自ServiceThread，统计store的信息
         this.storeStatsService = new StoreStatsService();
         this.indexService = new IndexService(this);
         this.haService = new HAService(this);
 
+        //继承自ServiceThread
         this.reputMessageService = new ReputMessageService();
 
+        //定时消息服务，暂时先不看
         this.scheduleMessageService = new ScheduleMessageService(this);
 
-
+        //todo view here
         this.allocateMapedFileService.start();
 
         //空实现....

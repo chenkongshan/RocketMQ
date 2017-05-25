@@ -31,7 +31,7 @@ public class SubscriptionGroupConfig {
     private boolean consumeEnable = true;
     private boolean consumeFromMinEnable = true;
 
-    private boolean consumeBroadcastEnable = true;
+    private boolean consumeBroadcastEnable = true;  //[ˈbrɔ:dkæst]
 
     private int retryQueueNums = 1;
 

@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BrokerFastFailure {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.BrokerLoggerName);
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(
+    private final ScheduledExecutorService /*['skedʒəld]*/scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryImpl(
             "BrokerFastFailureScheduledThread"));
     private final BrokerController brokerController;
 

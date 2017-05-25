@@ -72,6 +72,7 @@ public class CommitLog {
         if (FlushDiskType.SYNC_FLUSH == defaultMessageStore.getMessageStoreConfig().getFlushDiskType()) {
             this.flushCommitLogService = new GroupCommitService();
         } else {
+            //继承自ServiceThread
             this.flushCommitLogService = new FlushRealTimeService();
         }
 
@@ -987,10 +988,11 @@ public class CommitLog {
         // Store the message content
         private final ByteBuffer msgStoreItemMemory;
         // The maximum length of the message
-        private final int maxMessageSize;
+        private final int maxMessageSize;//default is 4M
 
 
         DefaultAppendMessageCallback(final int size) {
+            //default 16
             this.msgIdMemory = ByteBuffer.allocate(MessageDecoder.MSG_ID_LENGTH);
             this.msgStoreItemMemory = ByteBuffer.allocate(size + END_FILE_MIN_BLANK_LENGTH);
             this.maxMessageSize = size;
