@@ -174,8 +174,9 @@ public class MessageStoreConfig {
 
 
     public int getMapedFileSizeConsumeQueue() {
-
+        //300000 * 20 = 6000000 / 20 * 1.0 = 300000
         int factor = (int) Math.ceil(this.mapedFileSizeConsumeQueue / (ConsumeQueue.CQStoreUnitSize * 1.0));
+        //300000 * 20
         return (int) (factor * ConsumeQueue.CQStoreUnitSize);
     }
 

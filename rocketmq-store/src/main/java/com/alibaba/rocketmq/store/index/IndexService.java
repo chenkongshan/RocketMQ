@@ -42,7 +42,7 @@ public class IndexService {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.StoreLoggerName);
     private final DefaultMessageStore defaultMessageStore;
 
-    private final int hashSlotNum;
+    private final int hashSlotNum;  //哈希槽
     private final int indexNum;
     private final String storePath;
 

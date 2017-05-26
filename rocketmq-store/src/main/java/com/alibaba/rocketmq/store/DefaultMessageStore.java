@@ -125,7 +125,6 @@ public class DefaultMessageStore implements MessageStore {
         //定时消息服务，暂时先不看
         this.scheduleMessageService = new ScheduleMessageService(this);
 
-        //todo view here
         this.allocateMapedFileService.start();
 
         //空实现....
@@ -146,7 +145,8 @@ public class DefaultMessageStore implements MessageStore {
 
     /**
 
-     *
+     * 1、加载commitlog，即root/commitlog下的文件，加载即获取到文件的MappedByteBuffer
+     * 2、加载consumequeue，即root/consumequeue目录下的文件
      * @throws IOException
      */
     public boolean load() {
@@ -154,11 +154,9 @@ public class DefaultMessageStore implements MessageStore {
 
         try {
             //判断是否存在root/abort，存在说明未正常退出
+            //abort  [əˈbɔ:rt]  中止
             boolean lastExitOK = !this.isTempFileExist();
             log.info("last shutdown {}", (lastExitOK ? "normally" : "abnormally"));
-
-
-
 
             if (null != scheduleMessageService) {
                 result = result && this.scheduleMessageService.load();
@@ -171,9 +169,11 @@ public class DefaultMessageStore implements MessageStore {
             result = result && this.loadConsumeQueue();
 
             if (result) {
+                //root/checkpoint
                 this.storeCheckpoint =
                         new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
 
+                //todo view here
                 this.indexService.load(lastExitOK);
 
 

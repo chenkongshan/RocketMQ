@@ -104,7 +104,7 @@ public class AllocateMapedFileService extends ServiceThread {
     }
 
 
-    public void shutdown() {
+        public void shutdown() {
         this.stoped = true;
         this.thread.interrupt();
 
@@ -135,6 +135,12 @@ public class AllocateMapedFileService extends ServiceThread {
 
     /**
      * Only interrupted by the external thread, will return false
+     * 这个操作的主要功能：
+     * 1、从requestQueue中获取AllocateRequest=req
+     * 2、用req。getFilePath从requestTable获取AllocateRequest=expectedReq
+     * 3、expectedReq==null，return
+     * 4、req！=expectedReq，return
+     * 5、若req.mapedFile==null，生成mapedFile
      */
     private boolean mmapOperation() {
         boolean isSuccess = false;

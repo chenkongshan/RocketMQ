@@ -37,6 +37,7 @@ public class IndexFile {
     private static int HASH_SLOT_SIZE = 4;
     private static int INDEX_SIZE = 20;
     private static int INVALID_INDEX = 0;
+
     private final int hashSlotNum;
     private final int indexNum;
     private final MapedFile mapedFile;

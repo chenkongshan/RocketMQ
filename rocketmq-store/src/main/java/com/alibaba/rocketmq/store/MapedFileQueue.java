@@ -39,9 +39,9 @@ public class MapedFileQueue {
 
     private static final int DeleteFilesBatchMax = 10;
 
-    private final String storePath;
+    private final String storePath;  //root/commitlog="D:/mqstore/store/commitlog"
 
-    private final int mapedFileSize;
+    private final int mapedFileSize;  //default 1024 * 1024 * 1024 = 1G
 
     private final List<MapedFile> mapedFiles = new ArrayList<MapedFile>();
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -165,6 +165,11 @@ public class MapedFileQueue {
     }
 
 
+    /**
+     * 加载root/commilog目录下的文件，生成MapedFile，然后添加到mapedFiles列表中
+     * 这个是公用的，也可能被其他服务使用，例如ConsumeQueue也会使用MapedFileQueue
+     * @return
+     */
     public boolean load() {
         File dir = new File(this.storePath);
         File[] files = dir.listFiles();

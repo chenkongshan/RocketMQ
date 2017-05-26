@@ -54,7 +54,7 @@ public class ConsumeQueue {
                         final int mapedFileSize,//
                         final DefaultMessageStore defaultMessageStore) {
         this.storePath = storePath;
-        this.mapedFileSize = mapedFileSize;
+        this.mapedFileSize = mapedFileSize;  //6000000
         this.defaultMessageStore = defaultMessageStore;
 
         this.topic = topic;
