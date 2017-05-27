@@ -199,6 +199,7 @@ public class DefaultMessageStore implements MessageStore {
      * @throws Exception
      */
     public void start() throws Exception {
+        //定时刷新consumeQueueTable中的数据到文件中
         this.flushConsumeQueueService.start();
         this.commitLog.start();
         this.storeStatsService.start();
@@ -1214,7 +1215,6 @@ public class DefaultMessageStore implements MessageStore {
     private void recover(final boolean lastExitOK) {
         this.recoverConsumeQueue();
 
-        //todo view here
         if (lastExitOK) {
             this.commitLog.recoverNormally();
         }
@@ -1548,8 +1548,9 @@ public class DefaultMessageStore implements MessageStore {
 
 
             //default 1000 * 60
-            int flushConsumeQueueThoroughInterval = DefaultMessageStore.this.getMessageStoreConfig().getFlushConsumeQueueThoroughInterval();
+            int flushConsumeQueueThoroughInterval = DefaultMessageStore.this.getMessageStoreConfig().getFlushConsumeQueueThoroughInterval();/*[ˈθɜ:roʊ] 彻底的*/
             long currentTimeMillis = System.currentTimeMillis();
+            //当前时间已经过了彻底刷新间隔
             if (currentTimeMillis >= (this.lastFlushTimestamp + flushConsumeQueueThoroughInterval)) {
                 this.lastFlushTimestamp = currentTimeMillis;
                 flushConsumeQueueLeastPages = 0;

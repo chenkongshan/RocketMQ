@@ -18,6 +18,7 @@ package com.alibaba.rocketmq.client.consumer.listener;
 
 import com.alibaba.rocketmq.common.message.MessageExt;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 
@@ -38,5 +39,5 @@ public interface MessageListenerConcurrently extends MessageListener {
      * @return
      */
     ConsumeConcurrentlyStatus consumeMessage(final List<MessageExt> msgs,
-                                             final ConsumeConcurrentlyContext context);
+                                             final ConsumeConcurrentlyContext context) throws UnsupportedEncodingException;
 }

@@ -8,6 +8,7 @@ import com.alibaba.rocketmq.client.exception.MQClientException;
 import com.alibaba.rocketmq.common.message.MessageExt;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -34,9 +35,9 @@ public class ConsumTest {
     private static class MsgListener implements MessageListenerConcurrently {
 
         @Override
-        public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+        public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) throws UnsupportedEncodingException {
             for (MessageExt ext : msgs) {
-                System.out.println(Thread.currentThread().getName() + ":" + ext);
+                System.out.println(Thread.currentThread().getName() + ":" + new String(ext.getBody(),"utf-8"));
             }
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         }

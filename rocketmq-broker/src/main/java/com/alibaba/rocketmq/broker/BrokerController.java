@@ -245,6 +245,7 @@ public class BrokerController {
             // TODO remove in future
             final long initialDelay = UtilAll.computNextMorningTimeMillis() - System.currentTimeMillis();
             final long period = 1000 * 60 * 60 * 24;
+            //统计broker信息
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
@@ -256,6 +257,7 @@ public class BrokerController {
                 }
             }, initialDelay, period, TimeUnit.MILLISECONDS);
 
+            //持久化ConcurrentHashMap<String/* topic@group */, ConcurrentHashMap<Integer, Long>> offsetTable
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
@@ -265,7 +267,7 @@ public class BrokerController {
                         log.error("schedule persist consumerOffset error.", e);
                     }
                 }
-            }, 1000 * 10, this.brokerConfig.getFlushConsumerOffsetInterval(), TimeUnit.MILLISECONDS);
+            }, 1000 * 10, this.brokerConfig.getFlushConsumerOffsetInterval()/*1000 * 5*/, TimeUnit.MILLISECONDS);
 
 
             this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
