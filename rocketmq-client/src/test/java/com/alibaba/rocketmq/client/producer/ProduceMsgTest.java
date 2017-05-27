@@ -17,7 +17,7 @@ public class ProduceMsgTest {
         producer.setNamesrvAddr("127.0.0.1:9876");
         producer.start();
 
-        Message message = new Message("test1", "test1", "this is a test1 msg".getBytes("utf-8"));
+        Message message = new Message("test", "test1", "this is a test1 msg".getBytes("utf-8"));
         SendResult send = producer.send(message);
         System.out.println(send);
 

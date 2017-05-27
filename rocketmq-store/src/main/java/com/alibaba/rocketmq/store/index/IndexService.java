@@ -42,8 +42,8 @@ public class IndexService {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.StoreLoggerName);
     private final DefaultMessageStore defaultMessageStore;
 
-    private final int hashSlotNum;  //哈希槽
-    private final int indexNum;
+    private final int hashSlotNum;  //哈希槽 默认值 5000000
+    private final int indexNum;  //default 5000000 * 4
     private final String storePath;
 
     private final ArrayList<IndexFile> indexFileList = new ArrayList<IndexFile>();

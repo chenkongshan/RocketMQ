@@ -147,6 +147,7 @@ public class DefaultMessageStore implements MessageStore {
 
      * 1、加载commitlog，即root/commitlog下的文件，加载即获取到文件的MappedByteBuffer
      * 2、加载consumequeue，即root/consumequeue目录下的文件
+     * 3、加载indexFile，即root/index目录下的文件
      * @throws IOException
      */
     public boolean load() {
@@ -173,7 +174,6 @@ public class DefaultMessageStore implements MessageStore {
                 this.storeCheckpoint =
                         new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
 
-                //todo view here
                 this.indexService.load(lastExitOK);
 
 
@@ -1214,7 +1214,7 @@ public class DefaultMessageStore implements MessageStore {
     private void recover(final boolean lastExitOK) {
         this.recoverConsumeQueue();
 
-
+        //todo view here
         if (lastExitOK) {
             this.commitLog.recoverNormally();
         }

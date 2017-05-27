@@ -23,7 +23,7 @@ public class ConsumTest {
     public void testConsume() throws MQClientException, InterruptedException {
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("testconsumer");
         consumer.setNamesrvAddr("127.0.0.1:9876");
-        consumer.subscribe("test", "test");
+        consumer.subscribe("test", "*");
         consumer.registerMessageListener(new MsgListener());
         consumer.start();
         System.out.println("消费者启动成功");

@@ -85,9 +85,11 @@ public class ConsumeQueue {
             if (index < 0)
                 index = 0;
 
+            //6000000
             int mapedFileSizeLogics = this.mapedFileSize;
             MapedFile mapedFile = mapedFiles.get(index);
             ByteBuffer byteBuffer = mapedFile.sliceByteBuffer();
+            //实际上获取的是文件的名称
             long processOffset = mapedFile.getFileFromOffset();
             long mapedFileOffset = 0;
             while (true) {

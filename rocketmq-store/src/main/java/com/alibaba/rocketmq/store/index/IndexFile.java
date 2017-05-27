@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.store.index;
 
@@ -46,10 +46,12 @@ public class IndexFile {
     private final IndexHeader indexHeader;
 
 
-    public IndexFile(final String fileName, final int hashSlotNum, final int indexNum,
+    public IndexFile(final String fileName, final int hashSlotNum/*5000000*/, final int indexNum/*5000000 * 4*/,
                      final long endPhyOffset, final long endTimestamp) throws IOException {
+        //default size is 420000040 bytes
         int fileTotalSize =
-                IndexHeader.INDEX_HEADER_SIZE + (hashSlotNum * HASH_SLOT_SIZE) + (indexNum * INDEX_SIZE);
+                IndexHeader.INDEX_HEADER_SIZE // 40
+                        + (hashSlotNum * HASH_SLOT_SIZE) + (indexNum * INDEX_SIZE);
         this.mapedFile = new MapedFile(fileName, fileTotalSize);
         this.fileChannel = this.mapedFile.getFileChannel();
         this.mappedByteBuffer = this.mapedFile.getMappedByteBuffer();
