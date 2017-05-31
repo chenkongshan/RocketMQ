@@ -106,7 +106,7 @@ public class DefaultMessageStore implements MessageStore {
         this.messageStoreConfig = messageStoreConfig;
         this.brokerStatsManager = brokerStatsManager;
         //继承自ServiceThread
-        this.allocateMapedFileService = new AllocateMapedFileService(this);// [ˈæləˌket]
+        this.allocateMapedFileService = new AllocateMapedFileService(this);// [ˈæləˌket] 分配
         this.commitLog = new CommitLog(this);
         this.consumeQueueTable = new ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* queueId */, ConsumeQueue>>(32);
 
@@ -209,7 +209,8 @@ public class DefaultMessageStore implements MessageStore {
             this.scheduleMessageService.start();
         }
 
-        if (this.getMessageStoreConfig().isDuplicationEnable()) {
+        //duplicationEnable default is false
+        if (this.getMessageStoreConfig().isDuplicationEnable()) {/* [ˌduplɪˈkeʃən, ˌdju-]  复制*/
             this.reputMessageService.setReputFromOffset(this.commitLog.getConfirmOffset());
         } else {
             this.reputMessageService.setReputFromOffset(this.commitLog.getMaxOffset());

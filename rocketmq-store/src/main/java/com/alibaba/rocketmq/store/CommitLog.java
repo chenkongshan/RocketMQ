@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Store all metadata downtime for recovery, data protection reliability
+ * Store all metadata downtime ([ˈdaʊnˌtaɪm] 停机时间) for recovery ([rɪˈkʌvəri]  恢复), data protection reliability [rɪˌlaɪəˈbɪlətɪ] 可靠性
  *
  * @author shijia.wxr
  *
@@ -772,21 +772,27 @@ public class CommitLog {
             CommitLog.log.info(this.getServiceName() + " service started");
 
             while (!this.isStoped()) {
+                //default is false
                 boolean flushCommitLogTimed = CommitLog.this.defaultMessageStore.getMessageStoreConfig().isFlushCommitLogTimed();
 
+                //default is 1000
                 int interval = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushIntervalCommitLog();
+                //default is 4
                 int flushPhysicQueueLeastPages = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogLeastPages();
 
-                int flushPhysicQueueThoroughInterval =
+                int flushPhysicQueueThoroughInterval =/*[ˈθɜ:roʊ] 彻底的*/
+                        //1000 * 10
                         CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogThoroughInterval();
 
                 boolean printFlushProgress = false;
 
                 // Print flush progress
                 long currentTimeMillis = System.currentTimeMillis();
+                //当前时间已经到了彻底刷新物理队列的间隔
                 if (currentTimeMillis >= (this.lastFlushTimestamp + flushPhysicQueueThoroughInterval)) {
                     this.lastFlushTimestamp = currentTimeMillis;
                     flushPhysicQueueLeastPages = 0;
+                    //彻底刷新10次，打印一次
                     printFlushProgress = ((printTimes++ % 10) == 0);
                 }
 
@@ -797,6 +803,7 @@ public class CommitLog {
                         this.waitForRunning(interval);
                     }
 
+                    //没什么用，空实现
                     if (printFlushProgress) {
                         this.printFlushProgress();
                     }
@@ -990,7 +997,7 @@ public class CommitLog {
         // The maximum length of the message
         private final int maxMessageSize;//default is 4M
 
-
+        //size default is 4MB
         DefaultAppendMessageCallback(final int size) {
             //default 16
             this.msgIdMemory = ByteBuffer.allocate(MessageDecoder.MSG_ID_LENGTH);
@@ -1004,13 +1011,45 @@ public class CommitLog {
         }
 
 
+        /**
+         * 被MapedFile.appendMessage方法调用
+         *
+         * 把msg写入commitLog的每一条记录的格式：
+         * 总共需要写入17项内容：
+         * 1.putInt,msg total size
+         * 2.putInt,magic code,MessageMagicCode=0xAABBCCDD ^ 1880681586 + 8
+         * 3.putInt,bodyCRC
+         * 4.putInt,queueId
+         * 5.putInt,flag
+         * 6.putLong,queueOffset，存储消息队列的偏移量
+         * 7.putLong,physicalOffset,物理偏移量，即文件名称+当前文件的wroteOffset
+         * 8.putInt,sysflag
+         * 9.putLong,bornTimestamp
+         * 10.put,born host address,8 bytes
+         * 11.putLong,storeTimestamp
+         * 12.put,store host address,8 bytes
+         * 13.putInt,reconsume times
+         * 14.putLong,prepared transaction offset
+         * 15.putInt,bodyLength,if(bodyLength > 0),put,body bytes
+         * 16.put,topicLength,1 byte,put,topicData
+         * 17.putShort,propertiesLength
+         * if(propertiesLength > 0),put,propertiesData
+         *
+         * @param fileFromOffset 物理开始偏移，即文件的名称
+         * @param byteBuffer 已经设置position为wroteOffset的文件映射MapedByteBuffer
+         * @param maxBlank 文件剩余的可写空间，fileSize-wroteOffset
+         * @param msg 待写入的消息
+         *
+         * @return
+         */
         public AppendMessageResult doAppend(final long fileFromOffset, final ByteBuffer byteBuffer, final int maxBlank, final Object msg) {
             // STORETIMESTAMP + STOREHOSTADDRESS + OFFSET <br>
             MessageExtBrokerInner msgInner = (MessageExtBrokerInner) msg;
             // PHY OFFSET
             long wroteOffset = fileFromOffset + byteBuffer.position();
 
-
+            //wroteOffset 物理偏移量
+            //实际上生成msgId使用的是storeHostAddress和物理偏移量来生成的
             String msgId = MessageDecoder.createMessageId(this.msgIdMemory, msgInner.getStoreHostBytes(), wroteOffset);
 
             // Record ConsumeQueue information
@@ -1055,14 +1094,14 @@ public class CommitLog {
 
             final int msgLen = calMsgLength(bodyLength, topicLength, propertiesLength);
 
-            // Exceeds the maximum message
+            // Exceeds/* [ɪkˈsid] 超过*/ the maximum message
             if (msgLen > this.maxMessageSize) {
                 CommitLog.log.warn("message size exceeded, msg total size: " + msgLen + ", msg body size: " + bodyLength
                         + ", maxMessageSize: " + this.maxMessageSize);
                 return new AppendMessageResult(AppendMessageStatus.MESSAGE_SIZE_EXCEEDED);
             }
 
-            // Determines whether there is sufficient free space
+            // Determines/* [dɪˈtɜ:rmɪn] 决定*/ whether there is sufficient/*[səˈfɪʃənt] 足够的*/ free space
             if ((msgLen + END_FILE_MIN_BLANK_LENGTH) > maxBlank) {
                 this.resetMsgStoreItemMemory(maxBlank);
                 // 1 TOTALSIZE

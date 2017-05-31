@@ -48,7 +48,7 @@ public abstract class ReferenceResource {
 
 
 
-    public void shutdown(final long intervalForcibly) {
+    public void shutdown(final long intervalForcibly/* [ˈfɔ:rsəbli]  强行*/) {
         if (this.available) {
             this.available = false;
             this.firstShutdownTimestamp = System.currentTimeMillis();

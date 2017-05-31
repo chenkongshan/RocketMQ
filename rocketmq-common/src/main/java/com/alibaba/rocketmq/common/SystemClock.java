@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class SystemClock {
 
-    private final long precision;
+    private final long precision;/*[prɪˈsɪʒən] 精度*/
     private final AtomicLong now;
 
 

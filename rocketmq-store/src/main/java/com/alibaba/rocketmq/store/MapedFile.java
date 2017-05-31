@@ -54,7 +54,7 @@ public class MapedFile extends ReferenceResource {
 
     private final String fileName;
 
-    private final long fileFromOffset;
+    private final long fileFromOffset;  //file name
 
     private final int fileSize;
 
@@ -260,6 +260,12 @@ public class MapedFile extends ReferenceResource {
         return this.getCommittedPosition();
     }
 
+    /**
+     * 刷新最小页数，一页的大小是1024 * 4
+     * 判断的条件是，如果flushLeastPages > 0，wroteOffset / 4096 - commitedOffset / 4096 > flushLeastPages
+     * @param flushLeastPages
+     * @return
+     */
     private boolean isAbleToFlush(final int flushLeastPages) {
         int flush = this.committedPosition.get();
         int write = this.wrotePostion.get();
