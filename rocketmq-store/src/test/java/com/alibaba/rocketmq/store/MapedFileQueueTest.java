@@ -20,7 +20,10 @@
  */
 package com.alibaba.rocketmq.store;
 
+import com.alibaba.rocketmq.store.config.MessageStoreConfig;
 import org.junit.*;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -49,6 +52,28 @@ public class MapedFileQueueTest {
     public void tearDown() throws Exception {
     }
 
+
+    @Test
+    public void testCreateFile() {
+        try {
+            DefaultMessageStore store = new DefaultMessageStore(new MessageStoreConfig(), null, null, null);
+            AllocateMapedFileService s = new AllocateMapedFileService(store);
+            MapedFileQueue queue = new MapedFileQueue("d:/mqstore/test/mapqueue", 1024, s);
+            //queue.load();
+            s.start();
+            for(int i = 0; i < 1024; i++) {
+                MapedFile mapedFile = queue.getLastMapedFile();
+                boolean result = mapedFile.appendMessage("1234".getBytes());
+                if (!result) {
+                    System.out.println("append message + " + i);
+                }
+            }
+            //queue.shutdown(1000);
+            //queue.destroy();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test_getLastMapedFile() {

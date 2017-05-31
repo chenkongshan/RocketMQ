@@ -106,7 +106,7 @@ public class MapedFileQueue {
     }
 
 
-    private Object[] copyMapedFiles(final int reservedMapedFiles) {
+    private Object[] copyMapedFiles(final int reservedMapedFiles) {  // [rɪˈzɜ:rvd]  保留
         Object[] mfs = null;
 
         try {
@@ -125,6 +125,7 @@ public class MapedFileQueue {
     }
 
 
+    // [ˈtrʌŋkeɪt] 截断
     public void truncateDirtyFiles(long offset) {
         List<MapedFile> willRemoveFiles = new ArrayList<MapedFile>();
 
@@ -142,6 +143,7 @@ public class MapedFileQueue {
             }
         }
 
+        // [ɪkˈspaɪr] 到期
         this.deleteExpiredFile(willRemoveFiles);
     }
 
@@ -289,6 +291,7 @@ public class MapedFileQueue {
         return mapedFileLast;
     }
 
+    //重置物理偏移量，把偏移以后的文件删除
     public boolean resetOffset(long offset) {
         this.readWriteLock.writeLock().lock();
         if (!this.mapedFiles.isEmpty()) {
@@ -299,6 +302,7 @@ public class MapedFileQueue {
 
             final int maxdiff = 1024 * 1024 * 1024 * 2;
 
+            //重置的偏移量与最后偏移量差额不能超过2GB
             if (diff > maxdiff) return false;
         }
 
@@ -367,6 +371,7 @@ public class MapedFileQueue {
                                        final long intervalForcibly,//
                                        final boolean cleanImmediately//
     ) {
+        //mfs=mapedFiles
         Object[] mfs = this.copyMapedFiles(0);
 
         if (null == mfs)

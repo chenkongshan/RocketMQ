@@ -5,14 +5,16 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * <p>
+ * $Id: MapedFileTest.java 1831 2013-05-16 01:39:51Z shijia.wxr $
  */
 
 /**
@@ -45,6 +47,25 @@ public class MapedFileTest {
     public static void tearDownAfterClass() throws Exception {
     }
 
+
+    /**
+     * 测试生成MapedFile
+     */
+    @Test
+    public void testMapedFile() {
+        try {
+            MapedFile mapedFile = new MapedFile("d:/mqstore/test/mapfiletest/000", 1024 * 64);
+            mapedFile.appendMessage(StoreMessage.getBytes());
+            mapedFile.appendMessage(StoreMessage.getBytes());
+            SelectMapedBufferResult sr = mapedFile.selectMapedBuffer(32, 32);
+            sr.release();
+            mapedFile.shutdown(1000);
+            assertTrue(!mapedFile.isAvailable());
+            mapedFile.destroy(1000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void test_write_read() {
