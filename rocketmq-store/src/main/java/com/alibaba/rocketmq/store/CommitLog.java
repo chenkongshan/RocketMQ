@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.store;
 
@@ -335,17 +335,17 @@ public class CommitLog {
             }
 
             return new DispatchRequest(//
-                topic, // 1
-                queueId, // 2
-                physicOffset, // 3
-                totalSize, // 4
-                tagsCode, // 5
-                storeTimestamp, // 6
-                queueOffset, // 7
-                keys, // 8
-                uniqKey, //9
-                sysFlag, // 9
-                preparedTransactionOffset// 10
+                    topic, // 1
+                    queueId, // 2
+                    physicOffset, // 3
+                    totalSize, // 4
+                    tagsCode, // 5
+                    storeTimestamp, // 6
+                    queueOffset, // 7
+                    keys, // 8
+                    uniqKey, //9
+                    sysFlag, // 9
+                    preparedTransactionOffset// 10
             );
         } catch (Exception e) {
         }
@@ -762,6 +762,8 @@ public class CommitLog {
     abstract class FlushCommitLogService extends ServiceThread {
     }
 
+    //实时刷盘服务
+    //实际上就是调用MapedFileQueue的commit
     class FlushRealTimeService extends FlushCommitLogService {
         private static final int RetryTimesOver = 3;
         private long lastFlushTimestamp = 0;
@@ -990,7 +992,7 @@ public class CommitLog {
 
     class DefaultAppendMessageCallback implements AppendMessageCallback {
         // File at the end of the minimum fixed length empty
-        private static final int END_FILE_MIN_BLANK_LENGTH = 4 + 4;
+        private static final int END_FILE_MIN_BLANK_LENGTH = 4 + 4;//为什么文件末尾是8字节？因为需要存放msgTotalSize（int）和BlankMagicCode（int）
         private final ByteBuffer msgIdMemory;
         // Store the message content
         private final ByteBuffer msgStoreItemMemory;
@@ -999,9 +1001,11 @@ public class CommitLog {
 
         //size default is 4MB
         DefaultAppendMessageCallback(final int size) {
-            //default 16
+            //default 16 bytes
             this.msgIdMemory = ByteBuffer.allocate(MessageDecoder.MSG_ID_LENGTH);
+            //8 bytes
             this.msgStoreItemMemory = ByteBuffer.allocate(size + END_FILE_MIN_BLANK_LENGTH);
+            //max size is 4MB
             this.maxMessageSize = size;
         }
 
@@ -1054,6 +1058,8 @@ public class CommitLog {
 
             // Record ConsumeQueue information
             String key = msgInner.getTopic() + "-" + msgInner.getQueueId();
+            //HashMap<String/* topic-queueid */, Long/* offset */> topicQueueTable
+            //根据topic和queueId，获取到对应queue的偏移量
             Long queueOffset = CommitLog.this.topicQueueTable.get(key);
             if (null == queueOffset) {
                 queueOffset = 0L;
