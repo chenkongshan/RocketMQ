@@ -221,12 +221,25 @@ public class MapedFileQueue {
     }
 
 
+    /**
+     * 获取最后一个MapedFile
+     * 只有当needCreate为true才会创建文件
+     * 若mapedFiles列表中不存在数据，创建文件
+     * mapedFiles存在文件，获取最有一个文件，若最后一个文件已经full（即wroteOffset=fileSize），
+     * 则创建新的文件
+     * 如果使用AllocateMapedFileService创建新文件，会创建两个文件。
+     * @param startOffset 起始偏移量
+     * @param needCreate 是否需要创建MapedFile
+     * @return
+     */
     public MapedFile getLastMapedFile(final long startOffset, boolean needCreate) {
         long createOffset = -1;
         MapedFile mapedFileLast = null;
         {
             this.readWriteLock.readLock().lock();
             if (this.mapedFiles.isEmpty()) {
+                //2500 - 2500 % 1024 = 2500 - 452 = 2048
+                //计算的是比startOffset小于或者等于的fileSize的整数倍
                 createOffset = startOffset - (startOffset % this.mapedFileSize);
             } else {
                 mapedFileLast = this.mapedFiles.get(this.mapedFiles.size() - 1);
