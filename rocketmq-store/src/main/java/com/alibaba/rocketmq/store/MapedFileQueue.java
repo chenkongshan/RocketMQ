@@ -382,7 +382,7 @@ public class MapedFileQueue {
                                        final long expiredTime, //
                                        final int deleteFilesInterval, //
                                        final long intervalForcibly,//
-                                       final boolean cleanImmediately//
+                                       final boolean cleanImmediately//如果为true，则立即删除，不考虑过期时间
     ) {
         //mfs=mapedFiles
         Object[] mfs = this.copyMapedFiles(0);

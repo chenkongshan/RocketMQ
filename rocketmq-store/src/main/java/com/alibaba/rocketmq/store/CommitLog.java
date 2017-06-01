@@ -87,6 +87,7 @@ public class CommitLog {
     }
 
     public void start() {
+        //启动的是刷盘服务，1秒提交一次，10秒彻底提交一次
         this.flushCommitLogService.start();
     }
 
@@ -115,7 +116,7 @@ public class CommitLog {
 
 
     /**
-     * Read CommitLog data, use data replication
+     * Read CommitLog data, use data replication [ˌrɛplɪˈkeʃən] 复制
      */
     public SelectMapedBufferResult getData(final long offset) {
         return this.getData(offset, (0 == offset ? true : false));
@@ -137,6 +138,8 @@ public class CommitLog {
 
     /**
      * When the normal exit, data recovery, all memory data have been flush
+     * 其实这个恢复功能，就是根据最后三个MapedFile计算出物理偏移量，设置MapedFileQueue的committedWhere为偏移量
+     * 删除偏移量后面的MapedFile，设置最后一个MapedFile的wroteOffset和committedPosition为偏移量
      */
     public void recoverNormally() {
         boolean checkCRCOnRecover = this.defaultMessageStore.getMessageStoreConfig().isCheckCRCOnRecover();
@@ -183,7 +186,9 @@ public class CommitLog {
             }
 
             processOffset += mapedFileOffset;
+            //设置MapedFileQueue的committedWhere为计算出来的最后物理偏移量
             this.mapedFileQueue.setCommittedWhere(processOffset);
+            //删除偏移量后面的无效文件，并且设置最后一个mapedFile的wroteOffset和committedPosition为计算的偏移量
             this.mapedFileQueue.truncateDirtyFiles(processOffset);
         }
     }
