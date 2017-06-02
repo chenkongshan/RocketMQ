@@ -30,6 +30,12 @@ import java.util.List;
  */
 public class ConsumeQueue {
 
+    /**
+     * consumeQueue文件中，每个单元的大小是20字节，格式为：
+     * Long:offset
+     * int:size
+     * Long:tagsCode
+     */
     public static final int CQStoreUnitSize = 20;
     private static final Logger log = LoggerFactory.getLogger(LoggerName.StoreLoggerName);
     private static final Logger logError = LoggerFactory.getLogger(LoggerName.StoreErrorLoggerName);
@@ -265,6 +271,8 @@ public class ConsumeQueue {
             }
         }
     }
+
+
     public long getLastOffset() {
         long lastOffset = -1;
 
