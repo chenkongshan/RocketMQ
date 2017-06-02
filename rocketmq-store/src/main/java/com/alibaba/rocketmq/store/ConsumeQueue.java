@@ -273,6 +273,10 @@ public class ConsumeQueue {
     }
 
 
+    /**
+     * 实际上获取的是commitLog中的物理偏移量
+     * @return
+     */
     public long getLastOffset() {
         long lastOffset = -1;
 

@@ -202,6 +202,8 @@ public class DefaultMessageStore implements MessageStore {
         //定时刷新consumeQueueTable中的数据到文件中
         this.flushConsumeQueueService.start();
         this.commitLog.start();
+
+        //存储统计服务
         this.storeStatsService.start();
 
 
@@ -1531,6 +1533,10 @@ public class DefaultMessageStore implements MessageStore {
             return CleanConsumeQueueService.class.getSimpleName();
         }
     }
+
+    /**
+     * 刷新consumeQueue的服务，1秒刷新一次，60秒彻底刷新一次
+     */
     class FlushConsumeQueueService extends ServiceThread {
         private static final int RetryTimesOver = 3;
         private long lastFlushTimestamp = 0;
