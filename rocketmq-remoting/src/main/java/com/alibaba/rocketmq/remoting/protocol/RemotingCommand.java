@@ -46,6 +46,7 @@ public class RemotingCommand {
     private static final Map<Class<? extends CommandCustomHeader>, Field[]> clazzFieldsCache =
             new HashMap<Class<? extends CommandCustomHeader>, Field[]>();
     private static final Map<Class, String> canonicalNameCache = new HashMap<Class, String>();
+    /*canonical  [kəˈnɑ:nɪkl]  规范*/
     // 1, RESPONSE_COMMAND
     private static final Map<Field, Annotation> notNullAnnotationCache = new HashMap<Field, Annotation>();
     // 1, Oneway
@@ -82,7 +83,12 @@ public class RemotingCommand {
     private int code;
     private LanguageCode language = LanguageCode.JAVA;
     private int version = 0;
-    private int opaque = requestId.getAndIncrement();
+    private int opaque = requestId.getAndIncrement();/*[oʊˈpeɪk]  不透明的*/
+    /**
+     * 这个flag被赋予了两个含义，都是通过位运算来进行标记的
+     * 末尾是用来标记RPC_TYPE的，即是request还是response，如果末位是0，表示为request，1表示response
+     * 倒数第二位是标记RCP_ONEWAY，1表示是ONEWAY
+     */
     private int flag = 0;
     private String remark;
     private HashMap<String, String> extFields;

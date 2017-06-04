@@ -98,7 +98,7 @@ public abstract class NettyRemotingAbstract {
     public void processRequestCommand(final ChannelHandlerContext ctx, final RemotingCommand cmd) {
         final Pair<NettyRequestProcessor, ExecutorService> matched = this.processorTable.get(cmd.getCode());
         final Pair<NettyRequestProcessor, ExecutorService> pair = null == matched ? this.defaultRequestProcessor : matched;
-        final int opaque = cmd.getOpaque();
+        final int opaque = cmd.getOpaque();/* [oʊˈpeɪk] 不透明的*/
 
         if (pair != null) {
             Runnable run = new Runnable() {
