@@ -81,7 +81,7 @@ public class ProduceMsgTest {
                     while (!Thread.interrupted()) {
                         try {
                             TimeUnit.MILLISECONDS.sleep(20);
-                            Message message = new Message("test", Thread.currentThread().getName(), randomString(1000).getBytes("utf-8"));
+                            Message message = new Message("test1", Thread.currentThread().getName(), randomString(1000).getBytes("utf-8"));
                             SendResult send = producer.send(message);
                             System.out.println(send);
                         } catch (InterruptedException e) {
