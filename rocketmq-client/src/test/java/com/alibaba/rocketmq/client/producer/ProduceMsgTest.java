@@ -60,6 +60,17 @@ public class ProduceMsgTest {
     }
 
     @Test
+    public void testSendOneMsg() throws MQClientException, RemotingException, InterruptedException, MQBrokerException {
+        DefaultMQProducer producer = new DefaultMQProducer("producer");
+        producer.setNamesrvAddr("127.0.0.1:9876");
+        producer.start();
+
+        Message message = new Message("test", "hellokitty", "this is my word!".getBytes());
+        SendResult result = producer.send(message);
+        System.out.println(result);
+    }
+
+    @Test
     public void sendMsg() throws Exception {
         final DefaultMQProducer producer = new DefaultMQProducer("producer");
         producer.setNamesrvAddr("127.0.0.1:9876");
