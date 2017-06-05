@@ -396,6 +396,7 @@ public class MQClientInstance {
         }
 
         long times = this.storeTimesTotal.getAndIncrement();
+        //ConcurrentHashMap<String/* Broker Name */, HashMap<Long/* brokerId */, String/* address */>>
         Iterator<Entry<String, HashMap<Long, String>>> it = this.brokerAddrTable.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String, HashMap<Long, String>> entry = it.next();

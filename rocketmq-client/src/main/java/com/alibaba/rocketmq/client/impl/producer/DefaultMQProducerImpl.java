@@ -138,6 +138,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                             null);
                 }
 
+                //ConcurrentHashMap<String/* topic */, TopicPublishInfo> topicPublishInfoTable
                 this.topicPublishInfoTable.put(this.defaultMQProducer.getCreateTopicKey(), new TopicPublishInfo());
 
                 if (startFactory) {
@@ -416,6 +417,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                                        final long timeout//
     ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         this.makeSureStateOK();
+        //校验topic，校验body，body不能超过4MB
         Validators.checkMessage(msg, this.defaultMQProducer);
 
         final long invokeID = random.nextLong();
@@ -1029,6 +1031,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
     }
 
     public SendResult send(Message msg, long timeout) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        //communication  [kəˌmjunɪˈkeʃən] 通信
         return this.sendDefaultImpl(msg, CommunicationMode.SYNC, null, timeout);
     }
 
