@@ -32,6 +32,8 @@ public class TopicPublishInfo {
     private boolean orderTopic = false;
     private boolean haveTopicRouterInfo = false;
     private List<MessageQueue> messageQueueList = new ArrayList<MessageQueue>();
+    //这个东西是用来选择MessageQueue的，如果是相同线程发送message，则发送的queueId是轮询的方式，如果都是不同的线程发送message，
+    //则发送的queueId是随机的方式，因为sendWhichQueue内部使用的是ThreadLocal
     private volatile ThreadLocalIndex sendWhichQueue = new ThreadLocalIndex(0);
     private TopicRouteData topicRouteData;
 
@@ -82,7 +84,9 @@ public class TopicPublishInfo {
         if (lastBrokerName == null) {
             return selectOneMessageQueue();
         } else {
+            //这是实际上是先加1然后才返回的
             int index = this.sendWhichQueue.getAndIncrement();
+            //为了挑选出跟上一次brokerName不同的MessageQueue
             for (int i = 0; i < this.messageQueueList.size(); i++) {
                 int pos = Math.abs(index++) % this.messageQueueList.size();
                 if (pos < 0)

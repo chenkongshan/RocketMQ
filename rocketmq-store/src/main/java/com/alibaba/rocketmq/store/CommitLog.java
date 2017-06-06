@@ -517,7 +517,7 @@ public class CommitLog {
     public PutMessageResult putMessage(final MessageExtBrokerInner msg) {
         // Set the storage time
         msg.setStoreTimestamp(System.currentTimeMillis());
-        // Set the message body BODY CRC (consider the most appropriate setting
+        // Set the message body BODY CRC (consider  [kənˈsɪdər ] 考虑 the most appropriate  [əˈproʊpriət]  合适的 setting
         // on the client)
         msg.setBodyCRC(UtilAll.crc32(msg.getBody()));
         // Back to Results

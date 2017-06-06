@@ -26,7 +26,7 @@ import com.alibaba.rocketmq.common.message.MessageExt;
 public class MessageExtBrokerInner extends MessageExt {
     private static final long serialVersionUID = 7256001576878700634L;
     private String propertiesString;
-    private long tagsCode;
+    private long tagsCode;  //tags的hashCode
 
     public static long tagsString2tagsCode(final TopicFilterType filter, final String tags) {
         if (null == tags || tags.length() == 0)

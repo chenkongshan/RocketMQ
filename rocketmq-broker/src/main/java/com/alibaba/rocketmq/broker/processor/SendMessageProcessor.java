@@ -72,6 +72,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
                     return null;
                 }
 
+                //没有注册sendMessageHook，mqtraceContext=null
                 mqtraceContext = buildMsgContext(ctx, requestHeader);
                 this.executeSendMessageHookBefore(ctx, request, mqtraceContext);
                 final RemotingCommand response = this.sendMessage(ctx, request, mqtraceContext, requestHeader);
@@ -336,6 +337,7 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
         msgInner.setFlag(requestHeader.getFlag());
         MessageAccessor.setProperties(msgInner, MessageDecoder.string2messageProperties(requestHeader.getProperties()));
         msgInner.setPropertiesString(requestHeader.getProperties());
+        //计算tags的hashCode
         msgInner.setTagsCode(MessageExtBrokerInner.tagsString2tagsCode(topicConfig.getTopicFilterType(), msgInner.getTags()));
 
         msgInner.setQueueId(queueIdInt);

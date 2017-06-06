@@ -414,7 +414,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                                        Message msg, //
                                        final CommunicationMode communicationMode, //
                                        final SendCallback sendCallback, //
-                                       final long timeout//
+                                       final long timeout//DefaultMqProducer default sendMsgTimeout is 3000
     ) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
         this.makeSureStateOK();
         //校验topic，校验body，body不能超过4MB
@@ -429,10 +429,12 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             MessageQueue mq = null;
             Exception exception = null;
             SendResult sendResult = null;
+            //默认是同步方式，因此总共次数是3次
             int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
             int times = 0;
             String[] brokersSent = new String[timesTotal];
             for (; times < timesTotal; times++) {
+                //这个用来保证，上一次发送失败的queue，这一次不会再发送，会选择另外的queue进行发送
                 String lastBrokerName = null == mq ? null : mq.getBrokerName();
                 MessageQueue tmpmq = this.selectOneMessageQueue(topicPublishInfo, lastBrokerName);
                 if (tmpmq != null) {
@@ -568,6 +570,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                                       final SendCallback sendCallback, //
                                       final TopicPublishInfo topicPublishInfo, //
                                       final long timeout) throws MQClientException, RemotingException, MQBrokerException, InterruptedException {
+        //获取master broker address
         String brokerAddr = this.mQClientFactory.findBrokerAddressInPublish(mq.getBrokerName());
         if (null == brokerAddr) {
             tryToFindTopicPublishInfo(mq.getTopic());
@@ -576,6 +579,8 @@ public class DefaultMQProducerImpl implements MQProducerInner {
 
         SendMessageContext context = null;
         if (brokerAddr != null) {
+            //VIPChannelEnable默认是true
+            //port变成了10909，走的是fastRemotingServer
             brokerAddr = MixAll.brokerVIPChannel(this.defaultMQProducer.isSendMessageWithVIPChannel(), brokerAddr);
 
             byte[] prevBody = msg.getBody();
@@ -584,6 +589,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 MessageClientIDSetter.setUniqID(msg);
 
                 int sysFlag = 0;
+                //消息体大于4KB需要进行压缩，使用level=5，DefLater进行压缩，如果进行了压缩，使用body的时候必须要进行解压缩
                 if (this.tryToCompressMessage(msg)) {
                     sysFlag |= MessageSysFlag.CompressedFlag;
                 }
@@ -628,15 +634,15 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 SendMessageRequestHeader requestHeader = new SendMessageRequestHeader();
                 requestHeader.setProducerGroup(this.defaultMQProducer.getProducerGroup());
                 requestHeader.setTopic(msg.getTopic());
-                requestHeader.setDefaultTopic(this.defaultMQProducer.getCreateTopicKey());
-                requestHeader.setDefaultTopicQueueNums(this.defaultMQProducer.getDefaultTopicQueueNums());
+                requestHeader.setDefaultTopic(this.defaultMQProducer.getCreateTopicKey());//TBW102
+                requestHeader.setDefaultTopicQueueNums(this.defaultMQProducer.getDefaultTopicQueueNums());//4
                 requestHeader.setQueueId(mq.getQueueId());
-                requestHeader.setSysFlag(sysFlag);
+                requestHeader.setSysFlag(sysFlag);//使用位运算记录是否消息压缩，是否事务消息等
                 requestHeader.setBornTimestamp(System.currentTimeMillis());
-                requestHeader.setFlag(msg.getFlag());
+                requestHeader.setFlag(msg.getFlag());//flag default is 0
                 requestHeader.setProperties(MessageDecoder.messageProperties2String(msg.getProperties()));
                 requestHeader.setReconsumeTimes(0);
-                requestHeader.setUnitMode(this.isUnitMode());
+                requestHeader.setUnitMode(this.isUnitMode());//default is false
                 if (requestHeader.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {
                     String reconsumeTimes = MessageAccessor.getReconsumeTime(msg);
                     if (reconsumeTimes != null) {
@@ -652,6 +658,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 }
 
                 SendResult sendResult = null;
+                //默认通信模式是SYNC同步模式
                 switch (communicationMode) {
                     case ASYNC:
                         sendResult = this.mQClientFactory.getMQClientAPIImpl().sendMessage(//

@@ -32,7 +32,7 @@ public class Message implements Serializable {
 
     private String topic;
     private int flag;
-    private Map<String, String> properties;
+    private Map<String, String> properties;//可能包含：TAGS,KEYS,WAIT,UNIQ_KEY这个是发送MQ前生成的唯一key
     private byte[] body;
 
 
