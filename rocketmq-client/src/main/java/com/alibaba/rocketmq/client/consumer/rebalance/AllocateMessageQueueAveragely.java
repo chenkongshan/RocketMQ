@@ -34,8 +34,11 @@ public class AllocateMessageQueueAveragely implements AllocateMessageQueueStrate
     private final Logger log = ClientLogger.getLog();
 
     @Override
-    public List<MessageQueue> allocate(String consumerGroup, String currentCID, List<MessageQueue> mqAll,
-                                       List<String> cidAll) {
+    public List<MessageQueue> allocate(String consumerGroup,
+                                       String currentCID,
+                                       List<MessageQueue> mqAll,//eg. size = 2 * 4 = 8
+                                       List<String> cidAll// eg. size = 2
+    ) {
         if (currentCID == null || currentCID.length() < 1) {
             throw new IllegalArgumentException("currentCID is empty");
         }
@@ -55,8 +58,8 @@ public class AllocateMessageQueueAveragely implements AllocateMessageQueueStrate
             return result;
         }
 
-        int index = cidAll.indexOf(currentCID);
-        int mod = mqAll.size() % cidAll.size();
+        int index = cidAll.indexOf(currentCID);//eg. index=1
+        int mod = mqAll.size() % cidAll.size();//eg. 8 % 2 = 0
         int averageSize =
                 mqAll.size() <= cidAll.size() ? 1 : (mod > 0 && index < mod ? mqAll.size() / cidAll.size()
                         + 1 : mqAll.size() / cidAll.size());
