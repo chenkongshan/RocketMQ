@@ -66,7 +66,7 @@ public class MQClientInstance {
     private final Logger log = ClientLogger.getLog();
     private final ClientConfig clientConfig;
     private final int instanceIndex;
-    private final String clientId;
+    private final String clientId;  //IP@instanceName
     private final long bootTimestamp = System.currentTimeMillis();
     private final ConcurrentHashMap<String/* group */, MQProducerInner> producerTable = new ConcurrentHashMap<String, MQProducerInner>();
     private final ConcurrentHashMap<String/* group */, MQConsumerInner> consumerTable = new ConcurrentHashMap<String, MQConsumerInner>();
@@ -543,7 +543,7 @@ public class MQClientInstance {
     private HeartbeatData prepareHeartbeatData() {
         HeartbeatData heartbeatData = new HeartbeatData();
 
-        // clientID
+        // clientID IP@instanceName
         heartbeatData.setClientID(this.clientId);
 
         // Consumer

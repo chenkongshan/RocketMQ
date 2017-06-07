@@ -50,7 +50,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     protected final transient DefaultMQPushConsumerImpl defaultMQPushConsumerImpl;
     /**
      * Do the same thing for the same Group, the application must be set,and
-     * guarantee Globally unique
+     * guarantee  [ˌɡærənˈti]  保证 Globally unique
      */
     private String consumerGroup;
     /**
@@ -95,7 +95,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private int consumeThreadMax = 64;
 
     /**
-     * Threshold for dynamic adjustment of the number of thread pool
+     * Threshold [ˈθreʃhoʊld] 门槛 for dynamic adjustment of the number of thread pool
      */
     private long adjustThreadPoolNumsThreshold = 100000;
 

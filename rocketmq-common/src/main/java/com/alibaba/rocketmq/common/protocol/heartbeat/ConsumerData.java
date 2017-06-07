@@ -34,6 +34,7 @@ public class ConsumerData {
     private ConsumeType consumeType;
     private MessageModel messageModel;
     private ConsumeFromWhere consumeFromWhere;
+    //为什么是Set？一个group中，一个JVM应该只有一个group consumer，一个consumer应该只有一个topic和tags
     private Set<SubscriptionData> subscriptionDataSet = new HashSet<SubscriptionData>();
     private boolean unitMode;
 

@@ -534,6 +534,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                 this.copySubscription();
 
                 if (this.defaultMQPushConsumer.getMessageModel() == MessageModel.CLUSTERING) {
+                    //集群消费时，需要设置instanceName
                     this.defaultMQPushConsumer.changeInstanceNameToPID();
                 }
 
@@ -563,6 +564,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                             break;
                     }
                 }
+                //空实现
                 this.offsetStore.load();
 
                 if (this.getMessageListenerInner() instanceof MessageListenerOrderly) {
@@ -601,8 +603,10 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                 break;
         }
 
+        //pushConsumer启动时，会从name server 更新route info信息
         this.updateTopicSubscribeInfoWhenSubscriptionChanged();
 
+        //发送心跳到所有的broker，实际上是把当前consumer注册到broker上
         this.mQClientFactory.sendHeartbeatToAllBrokerWithLock();
 
         this.mQClientFactory.rebalanceImmediately();

@@ -50,7 +50,10 @@ public class ClientConfig {
     private boolean vipChannelEnabled = Boolean.parseBoolean(System.getProperty(SendMessageWithVIPChannelProperty, "true"));
     ;
 
-
+    /**
+     * IP@instanceName
+     * @return
+     */
     public String buildMQClientId() {
         StringBuilder sb = new StringBuilder();
         sb.append(this.getClientIP());

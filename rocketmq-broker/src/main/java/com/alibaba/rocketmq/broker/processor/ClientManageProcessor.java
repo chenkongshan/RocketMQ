@@ -86,7 +86,7 @@ public class ClientManageProcessor implements NettyRequestProcessor {
 
         ClientChannelInfo clientChannelInfo = new ClientChannelInfo(//
                 ctx.channel(),//
-                heartbeatData.getClientID(),//
+                heartbeatData.getClientID(),//IP@instanceName
                 request.getLanguage(),//
                 request.getVersion()//
         );
