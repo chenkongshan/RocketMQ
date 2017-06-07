@@ -983,6 +983,7 @@ public class MQClientInstance {
 
         if (null != brokerAddr) {
             try {
+                //从broker中根据group查询所有的同组的consumer的clientId
                 return this.mQClientAPIImpl.getConsumerIdListByGroup(brokerAddr, group, 3000);
             } catch (Exception e) {
                 log.warn("getConsumerIdListByGroup exception, " + brokerAddr + " " + group, e);
