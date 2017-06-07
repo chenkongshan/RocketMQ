@@ -1617,6 +1617,12 @@ public class DefaultMessageStore implements MessageStore {
             return 1000 * 60;
         }
     }
+
+    /**
+     * 这个可能功能是：
+     * 从commitLog中整理message，然后放入到ConsumeQueue中，
+     * 任务间隔是1毫秒，所以基本上是相当于实时的
+     */
     class ReputMessageService extends ServiceThread {
 
         private volatile long reputFromOffset = 0;
