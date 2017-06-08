@@ -49,7 +49,7 @@ public class ConsumeQueue {
 
     private final String storePath;
     private final int mapedFileSize;
-    private long maxPhysicOffset = -1;
+    private long maxPhysicOffset = -1; //这个是指commitLog的物理偏移量
     private volatile long minLogicOffset = 0;
 
 
@@ -390,6 +390,7 @@ public class ConsumeQueue {
             return true;
         }
 
+        //allocate 20 bytes
         this.byteBufferIndex.flip();
         this.byteBufferIndex.limit(CQStoreUnitSize);
         this.byteBufferIndex.putLong(offset);
@@ -422,6 +423,7 @@ public class ConsumeQueue {
                             );
                 }
             }
+            //这个是指commitLog的物理偏移量
             this.maxPhysicOffset = offset;
             return mapedFile.appendMessage(this.byteBufferIndex.array());
         }

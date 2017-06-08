@@ -38,7 +38,7 @@ public class StoreCheckpoint {
     private final FileChannel fileChannel;
     private final MappedByteBuffer mappedByteBuffer;
     private volatile long physicMsgTimestamp = 0;// ['fɪzɪk]
-    private volatile long logicsMsgTimestamp = 0;
+    private volatile long logicsMsgTimestamp = 0;  //场景：从commitLog读取message，然后放入到ConsumeQueue中时，这个字段赋值的是message的storeTimestamp
     private volatile long indexMsgTimestamp = 0;
 
 

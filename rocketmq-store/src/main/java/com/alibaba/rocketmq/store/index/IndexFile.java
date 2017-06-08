@@ -38,8 +38,8 @@ public class IndexFile {
     private static int INDEX_SIZE = 20;
     private static int INVALID_INDEX = 0;
 
-    private final int hashSlotNum;
-    private final int indexNum;
+    private final int hashSlotNum;//5000000
+    private final int indexNum;//5000000 * 4
     private final MapedFile mapedFile;
     private final FileChannel fileChannel;
     private final MappedByteBuffer mappedByteBuffer;

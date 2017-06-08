@@ -1027,7 +1027,7 @@ public class DefaultMessageStore implements MessageStore {
                     StorePathConfigHelper.getStorePathConsumeQueue(this.messageStoreConfig.getStorePathRootDir()), //
                     this.getMessageStoreConfig().getMapedFileSizeConsumeQueue(), //
                     this);
-            ConsumeQueue oldLogic = map.putIfAbsent(queueId, newLogic);
+            ConsumeQueue oldLogic = map.putIfAbsent(queueId, newLogic);// [ˈæbsənt] 缺席的，缺少的
             if (oldLogic != null) {
                 logic = oldLogic;
             } else {
@@ -1311,11 +1311,22 @@ public class DefaultMessageStore implements MessageStore {
                 break;
         }
 
+        //default is true
         if (DefaultMessageStore.this.getMessageStoreConfig().isMessageIndexEnable()) {
             DefaultMessageStore.this.indexService.buildIndex(req);
         }
     }
 
+    /**
+     * 从CommitLog中读取message，然后添加消息精简信息到ConsumeQueue
+     * @param topic
+     * @param queueId
+     * @param offset 物理偏移量
+     * @param size 消息大小
+     * @param tagsCode tags的hashCode
+     * @param storeTimestamp
+     * @param logicOffset 逻辑偏移量
+     */
     public void putMessagePostionInfo(String topic, int queueId, long offset, int size, long tagsCode, long storeTimestamp,
                                       long logicOffset) {
         ConsumeQueue cq = this.findConsumeQueue(topic, queueId);
@@ -1622,6 +1633,7 @@ public class DefaultMessageStore implements MessageStore {
      * 这个可能功能是：
      * 从commitLog中整理message，然后放入到ConsumeQueue中，
      * 任务间隔是1毫秒，所以基本上是相当于实时的
+     * 这个服务是单线程的，不会产生竞争关系
      */
     class ReputMessageService extends ServiceThread {
 
@@ -1648,6 +1660,10 @@ public class DefaultMessageStore implements MessageStore {
             super.shutdown();
         }
 
+        /**
+         * 在DefaultMessageStore start的时候，已经设置了reputFromOffset为commitLog的maxOffset
+         * @param reputFromOffset
+         */
         public void setReputFromOffset(long reputFromOffset) {
             this.reputFromOffset = reputFromOffset;
         }
@@ -1658,6 +1674,7 @@ public class DefaultMessageStore implements MessageStore {
 
 
         private boolean isCommitLogAvailable() {
+            //获取commitLog的最大物理偏移量
             return this.reputFromOffset < DefaultMessageStore.this.commitLog.getMaxOffset();
         }
 
@@ -1665,7 +1682,7 @@ public class DefaultMessageStore implements MessageStore {
         private void doReput() {
             for (boolean doNext = true; this.isCommitLogAvailable() && doNext; ) {
 
-                if (DefaultMessageStore.this.getMessageStoreConfig().isDuplicationEnable() //
+                if (DefaultMessageStore.this.getMessageStoreConfig().isDuplicationEnable() //[ˌduplɪˈkeʃən, ˌdju-] 复制 default is false
                         && this.reputFromOffset >= DefaultMessageStore.this.getConfirmOffset()) {
                     break;
                 }
@@ -1682,6 +1699,7 @@ public class DefaultMessageStore implements MessageStore {
 
                             if (dispatchRequest.isSuccess()) {
                                 if (size > 0) {
+                                    //添加message到ConsumeQueue，并且构建index
                                     DefaultMessageStore.this.doDispatch(dispatchRequest);
 
                                     if (BrokerRole.SLAVE != DefaultMessageStore.this.getMessageStoreConfig().getBrokerRole()
