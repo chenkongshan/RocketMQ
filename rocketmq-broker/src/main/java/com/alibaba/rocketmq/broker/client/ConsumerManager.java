@@ -106,6 +106,7 @@ public class ConsumerManager {
                                     ConsumeType consumeType, MessageModel messageModel, ConsumeFromWhere consumeFromWhere,
                                     final Set<SubscriptionData> subList) {
 
+        //ConcurrentHashMap<String/* Group */, ConsumerGroupInfo>
         ConsumerGroupInfo consumerGroupInfo = this.consumerTable.get(group);
         if (null == consumerGroupInfo) {
             ConsumerGroupInfo tmp = new ConsumerGroupInfo(group, consumeType, messageModel, consumeFromWhere);

@@ -770,6 +770,7 @@ public class MQClientAPIImpl {
         RemotingCommand request = RemotingCommand.createRequestCommand(RequestCode.HEART_BEAT, null);
 
         request.setBody(heartbeatData.encode());
+        //调用invokeSync，如果传入的addr为空，则会发送请求到nameServer，如果不为空，则发送到对应地址的服务器
         RemotingCommand response = this.remotingClient.invokeSync(addr, request, timeoutMillis);
         assert response != null;
         switch (response.getCode()) {

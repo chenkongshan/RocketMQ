@@ -181,11 +181,13 @@ public class ConsumerGroupInfo {
                     );
                 }
 
+                //如果集群状态下，相同group的消费者，订阅同一个topic，但是不同tags，就会导致在发送heart beat时，新的SubscriptionData覆盖老的信息
                 this.subscriptionTable.put(sub.getTopic(), sub);
             }
         }
 
 
+        //集群状态下，相同group的消费者，如果订阅不同的topic，会导致新发送的heart beat把old topic移除掉
         Iterator<Entry<String, SubscriptionData>> it = this.subscriptionTable.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String, SubscriptionData> next = it.next();

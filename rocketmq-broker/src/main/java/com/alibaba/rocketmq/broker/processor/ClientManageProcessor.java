@@ -85,7 +85,7 @@ public class ClientManageProcessor implements NettyRequestProcessor {
         HeartbeatData heartbeatData = HeartbeatData.decode(request.getBody(), HeartbeatData.class);
 
         ClientChannelInfo clientChannelInfo = new ClientChannelInfo(//
-                ctx.channel(),//
+                ctx.channel(),//客户端的channel
                 heartbeatData.getClientID(),//IP@instanceName
                 request.getLanguage(),//
                 request.getVersion()//
@@ -108,6 +108,7 @@ public class ClientManageProcessor implements NettyRequestProcessor {
                         PermName.PERM_WRITE | PermName.PERM_READ, topicSysFlag);
             }
 
+            //注册Consumer，更新group下的ConsumerGroupInfo信息，包括channel和SubscriptionData
             boolean changed = this.brokerController.getConsumerManager().registerConsumer(//
                     data.getGroupName(),//
                     clientChannelInfo,//

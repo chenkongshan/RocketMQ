@@ -122,8 +122,10 @@ public class MQClientInstance {
 
         this.mQAdminImpl = new MQAdminImpl(this);
 
+        //继承自ServiceThread
         this.pullMessageService = new PullMessageService(this);
 
+        //继承自ServiceThread
         this.rebalanceService = new RebalanceService(this);
 
         this.defaultMQProducer = new DefaultMQProducer(MixAll.CLIENT_INNER_PRODUCER_GROUP);
@@ -412,6 +414,7 @@ public class MQClientInstance {
                     Long id = entry1.getKey();
                     String addr = entry1.getValue();
                     if (addr != null) {
+                        //发送心跳，Consumer是需要发送所有master/slave broker，但是只有Producer的时候，是只发送master的服务器
                         if (consumerEmpty) {
                             if (id != MixAll.MASTER_ID)
                                 continue;
@@ -483,6 +486,8 @@ public class MQClientInstance {
                         TopicRouteData old = this.topicRouteTable.get(topic);
                         boolean changed = topicRouteDataIsChange(old, topicRouteData);
                         if (!changed) {
+                            //实际上是看看DefaultMQPushConsumerImpl中的RebalanceImpl中ConcurrentHashMap<String/* topic */, Set<MessageQueue>> topicSubscribeInfoTable
+                            //是否不包含新增的topic
                             changed = this.isNeedUpdateTopicRouteInfo(topic);
                         } else {
                             log.info("the topic[{}] route info changed, old[{}] ,new[{}]", topic, old, topicRouteData);

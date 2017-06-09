@@ -36,7 +36,7 @@ public class DefaultConsumerIdsChangeListener implements ConsumerIdsChangeListen
 
     @Override
     public void consumerIdsChanged(String group, List<Channel> channels) {
-        if (channels != null && brokerController.getBrokerConfig().isNotifyConsumerIdsChangedEnable()) {
+        if (channels != null && brokerController.getBrokerConfig().isNotifyConsumerIdsChangedEnable()/* default is true*/) {
             for (Channel chl : channels) {
                 this.brokerController.getBroker2Client().notifyConsumerIdsChanged(chl, group);
             }
