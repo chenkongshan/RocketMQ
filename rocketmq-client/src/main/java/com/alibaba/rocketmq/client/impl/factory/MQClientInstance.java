@@ -5,14 +5,14 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.alibaba.rocketmq.client.impl.factory;
 
@@ -77,6 +77,11 @@ public class MQClientInstance {
     private final ConcurrentHashMap<String/* Topic */, TopicRouteData> topicRouteTable = new ConcurrentHashMap<String, TopicRouteData>();
     private final Lock lockNamesrv = new ReentrantLock();
     private final Lock lockHeartbeat = new ReentrantLock();
+    /**
+     * 同一个brokerName为什么会对应一个Map<brokerId,brokerAddr>？
+     * 因为broker会设置为mater/slave模式，一个组合中，brokerName是相同的，
+     * 但是只有master的brokerId是0，其他的slave的brokerId不为0，因此会存在一个brokerName对应一个集群的情况
+     */
     private final ConcurrentHashMap<String/* Broker Name */, HashMap<Long/* brokerId */, String/* address */>> brokerAddrTable =
             new ConcurrentHashMap<String, HashMap<Long, String>>();
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
@@ -547,7 +552,7 @@ public class MQClientInstance {
         heartbeatData.setClientID(this.clientId);
 
         // Consumer
-        for(Map.Entry<String,MQConsumerInner> entry: this.consumerTable.entrySet()){
+        for (Map.Entry<String, MQConsumerInner> entry : this.consumerTable.entrySet()) {
             MQConsumerInner impl = entry.getValue();
             if (impl != null) {
                 ConsumerData consumerData = new ConsumerData();
@@ -781,6 +786,7 @@ public class MQClientInstance {
             return false;
         }
 
+        //ConcurrentHashMap<String/* group */, MQConsumerInner> consumerTable
         MQConsumerInner prev = this.consumerTable.putIfAbsent(group, consumer);
         if (prev != null) {
             log.warn("the consumer group[" + group + "] exist already.");
@@ -1021,9 +1027,9 @@ public class MQClientInstance {
 
             ConcurrentHashMap<MessageQueue, ProcessQueue> processQueueTable = consumer.getRebalanceImpl().getProcessQueueTable();
 
-            for(Map.Entry<MessageQueue,ProcessQueue> entry : processQueueTable.entrySet()){
+            for (Map.Entry<MessageQueue, ProcessQueue> entry : processQueueTable.entrySet()) {
                 MessageQueue mq = entry.getKey();
-                if(topic.equals(mq.getTopic())){
+                if (topic.equals(mq.getTopic())) {
                     ProcessQueue pq = entry.getValue();
                     pq.setDropped(true);
                     pq.clear();

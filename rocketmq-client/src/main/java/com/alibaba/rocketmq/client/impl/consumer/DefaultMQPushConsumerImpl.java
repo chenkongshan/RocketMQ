@@ -533,18 +533,28 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                         this.defaultMQPushConsumer.getMessageModel(), this.defaultMQPushConsumer.isUnitMode());
                 this.serviceState = ServiceState.START_FAILED;
 
+                /**
+                 * consumer group max length 255
+                 * consumer group can not be null
+                 * consumer group cant not equals "DEFAULT_CONSUMER"
+                 */
                 this.checkConfig();
 
+                //DefaultMQPushConsumer中存在Map<topic,subExpression>，会拷贝到DefaultMQPushConsumerImpl中
                 this.copySubscription();
 
                 if (this.defaultMQPushConsumer.getMessageModel() == MessageModel.CLUSTERING) {
-                    //集群消费时，需要设置instanceName
+                    //集群消费时，需要设置instanceName，如未设置instanceName，则会设置为PID
                     this.defaultMQPushConsumer.changeInstanceNameToPID();
                 }
 
+                //MQClientInstance实例，非常重要，生成clientId=ip@instanceName，如果已经存在clientId，则MQClientInstance实例会是同一个实例，也就是说如果
+                //默认不设置instanceName，则多个Consumer会共用一个MQClientInstance实例
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQPushConsumer, this.rpcHook);
 
+                //这个rebalanceImpl只是针对Consumer的
                 this.rebalanceImpl.setConsumerGroup(this.defaultMQPushConsumer.getConsumerGroup());
+                //clustering or broadcasting?
                 this.rebalanceImpl.setMessageModel(this.defaultMQPushConsumer.getMessageModel());
                 this.rebalanceImpl.setAllocateMessageQueueStrategy(this.defaultMQPushConsumer.getAllocateMessageQueueStrategy());
                 this.rebalanceImpl.setmQClientFactory(this.mQClientFactory);
@@ -581,6 +591,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                             new ConsumeMessageConcurrentlyService(this, (MessageListenerConcurrently) this.getMessageListenerInner());
                 }
 
+                //just start clean expire msg
                 this.consumeMessageService.start();
 
                 boolean registerOK = mQClientFactory.registerConsumer(this.defaultMQPushConsumer.getConsumerGroup(), this);
@@ -770,7 +781,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
             }
 
             switch (this.defaultMQPushConsumer.getMessageModel()) {
-                case BROADCASTING:
+                case BROADCASTING:// [ˈbrɔ:dkæstɪŋ] 广播
                     break;
                 case CLUSTERING:
                     final String retryTopic = MixAll.getRetryTopic(this.defaultMQPushConsumer.getConsumerGroup());
@@ -808,7 +819,8 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         try {
             SubscriptionData subscriptionData = FilterAPI.buildSubscriptionData(this.defaultMQPushConsumer.getConsumerGroup(), //
                     topic, subExpression);
-            this.rebalanceImpl.getSubscriptionInner().put(topic, subscriptionData);
+            //[re'bæləns]
+            this.rebalanceImpl.getSubscriptionInner().put(topic, subscriptionData); //[səbˈskrɪpʃən]
             if (this.mQClientFactory != null) {
                 this.mQClientFactory.sendHeartbeatToAllBrokerWithLock();
             }

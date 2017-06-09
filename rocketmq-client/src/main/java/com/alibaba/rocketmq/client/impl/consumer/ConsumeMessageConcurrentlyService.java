@@ -83,8 +83,9 @@ public class ConsumeMessageConcurrentlyService implements ConsumeMessageService 
             public void run() {
                 cleanExpireMsg();
             }
-
-        }, this.defaultMQPushConsumer.getConsumeTimeout(), this.defaultMQPushConsumer.getConsumeTimeout(), TimeUnit.MINUTES);
+        }, this.defaultMQPushConsumer.getConsumeTimeout(), //default is 15
+                this.defaultMQPushConsumer.getConsumeTimeout(),
+                TimeUnit.MINUTES);
     }
 
 

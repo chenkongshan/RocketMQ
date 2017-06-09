@@ -37,7 +37,7 @@ public class ConsumTest {
         @Override
         public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) throws UnsupportedEncodingException {
             for (MessageExt ext : msgs) {
-                System.out.println(Thread.currentThread().getName() + ":" + new String(ext.getBody(),"utf-8"));
+                System.out.println(Thread.currentThread().getName() + ":" + new String(ext.getBody(), "utf-8"));
             }
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         }

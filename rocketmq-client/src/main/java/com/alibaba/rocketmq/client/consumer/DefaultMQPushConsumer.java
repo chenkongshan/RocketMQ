@@ -62,7 +62,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
      */
     private ConsumeFromWhere consumeFromWhere = ConsumeFromWhere.CONSUME_FROM_LAST_OFFSET;
     /**
-     * Backtracking consumption time with second precision.time format is
+     * Backtracking consumption time with second precision  [prɪˈsɪʒən]  精确度.time format is
      * 20131223171201<br>
      * Implying Seventeen twelve and 01 seconds on December 23, 2013 year<br>
      * Default backtracking consumption time Half an hour ago
@@ -91,6 +91,7 @@ public class DefaultMQPushConsumer extends ClientConfig implements MQPushConsume
     private int consumeThreadMin = 20;
     /**
      * Max consumer thread number
+     * 设置这个消费最大线程数没什么用，因为消费消息的线程队列设置的为LinkedBlockingQueue，是无限长度队列，所以根本就不会启动除了核心线程以外的线程
      */
     private int consumeThreadMax = 64;
 

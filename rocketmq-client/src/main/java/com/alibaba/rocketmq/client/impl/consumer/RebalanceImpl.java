@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class RebalanceImpl {
     protected static final Logger log = ClientLogger.getLog();
-    protected final ConcurrentHashMap<MessageQueue, ProcessQueue> processQueueTable = new ConcurrentHashMap<MessageQueue, ProcessQueue>(64);
+    protected final ConcurrentHashMap<MessageQueue, ProcessQueue> processQueueTable = new ConcurrentHashMap<MessageQueue, ProcessQueue>(64);//Queue  [kju]  队列
     protected final ConcurrentHashMap<String/* topic */, Set<MessageQueue>> topicSubscribeInfoTable =
             new ConcurrentHashMap<String, Set<MessageQueue>>();
     protected final ConcurrentHashMap<String /* topic */, SubscriptionData> subscriptionInner =
