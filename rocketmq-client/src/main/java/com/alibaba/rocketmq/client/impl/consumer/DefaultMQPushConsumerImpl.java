@@ -217,7 +217,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         }
 
         long size = processQueue.getMsgCount().get();
-        if (size > this.defaultMQPushConsumer.getPullThresholdForQueue()) {
+        if (size > this.defaultMQPushConsumer.getPullThresholdForQueue()) {//[ˈθreʃhoʊld] 门槛
             this.executePullRequestLater(pullRequest, PullTimeDelayMillsWhenFlowControl);
             if ((flowControlTimes1++ % 1000) == 0) {
                 log.warn(

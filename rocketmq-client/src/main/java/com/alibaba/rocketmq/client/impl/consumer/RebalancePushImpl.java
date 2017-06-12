@@ -58,7 +58,11 @@ public class RebalancePushImpl extends RebalanceImpl {
 
     @Override
     public boolean removeUnnecessaryMessageQueue(MessageQueue mq, ProcessQueue pq) {
-        this.defaultMQPushConsumerImpl.getOffsetStore().persist(mq);
+        /**
+         * 更新ConsumerOffsetManager中的offset
+         * offset存储结构：ConcurrentHashMap<String topic@group , ConcurrentHashMap<Integer, Long>> offsetTable
+         */
+        this.defaultMQPushConsumerImpl.getOffsetStore().persist(mq);// [pərˈsɪst]  坚持 持久化
         this.defaultMQPushConsumerImpl.getOffsetStore().removeOffset(mq);
         if (this.defaultMQPushConsumerImpl.isConsumeOrderly()
                 && MessageModel.CLUSTERING.equals(this.defaultMQPushConsumerImpl.messageModel())) {

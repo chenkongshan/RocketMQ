@@ -227,7 +227,7 @@ public abstract class RebalanceImpl {
             }
         }
 
-        this.truncateMessageQueueNotMyTopic();
+        this.truncateMessageQueueNotMyTopic();// [ˈtrʌŋkeɪt] 截断
     }
 
     public ConcurrentHashMap<String, SubscriptionData> getSubscriptionInner() {
@@ -300,6 +300,7 @@ public abstract class RebalanceImpl {
                                 "rebalanced result changed. allocateMessageQueueStrategyName={}, group={}, topic={}, clientId={}, mqAllSize={}, cidAllSize={}, rebalanceResultSize={}, rebalanceResultSet={}",
                                 strategy.getName(), consumerGroup, topic, this.mQClientFactory.getClientId(), mqSet.size(), cidAll.size(),
                                 allocateResultSet.size(), allocateResultSet);
+                        //pushConsumer是空的实现
                         this.messageQueueChanged(topic, mqSet, allocateResultSet);
                     }
                 }
