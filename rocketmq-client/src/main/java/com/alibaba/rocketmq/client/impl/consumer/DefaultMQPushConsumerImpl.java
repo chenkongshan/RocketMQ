@@ -217,6 +217,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         }
 
         long size = processQueue.getMsgCount().get();
+        //default threshold is 1000
         if (size > this.defaultMQPushConsumer.getPullThresholdForQueue()) {//[ˈθreʃhoʊld] 门槛
             this.executePullRequestLater(pullRequest, PullTimeDelayMillsWhenFlowControl);
             if ((flowControlTimes1++ % 1000) == 0) {
@@ -228,6 +229,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         }
 
         if (!this.consumeOrderly) {
+            //default consumeConcurrentlyMaxSpan is 2000
             if (processQueue.getMaxSpan() > this.defaultMQPushConsumer.getConsumeConcurrentlyMaxSpan()) {
                 this.executePullRequestLater(pullRequest, PullTimeDelayMillsWhenFlowControl);
                 if ((flowControlTimes2++ % 1000) == 0) {
@@ -387,6 +389,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
         boolean classFilter = false;
         SubscriptionData sd = this.rebalanceImpl.getSubscriptionInner().get(pullRequest.getMessageQueue().getTopic());
         if (sd != null) {
+            //postSubscriptionWhenPull default is false
             if (this.defaultMQPushConsumer.isPostSubscriptionWhenPull() && !sd.isClassFilterMode()) {
                 subExpression = sd.getSubString();
             }
@@ -406,11 +409,11 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                     subExpression, // 2
                     subscriptionData.getSubVersion(), // 3
                     pullRequest.getNextOffset(), // 4
-                    this.defaultMQPushConsumer.getPullBatchSize(), // 5
+                    this.defaultMQPushConsumer.getPullBatchSize(), // 5 default is 32
                     sysFlag, // 6
                     commitOffsetValue, // 7
-                    BrokerSuspendMaxTimeMillis, // 8
-                    ConsumerTimeoutMillisWhenSuspend, // 9
+                    BrokerSuspendMaxTimeMillis, // 8 1000 * 15
+                    ConsumerTimeoutMillisWhenSuspend, // 9 1000 * 30
                     CommunicationMode.ASYNC, // 10
                     pullCallback// 11
             );
