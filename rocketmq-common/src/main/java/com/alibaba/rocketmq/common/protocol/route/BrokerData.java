@@ -33,6 +33,7 @@ import java.util.Map;
 public class BrokerData implements Comparable<BrokerData> {
     private String cluster;
     private String brokerName;
+    //broker会有master/slave模式，使用相同的brokerName，但是brokerId不同，master的brokerId为0
     private HashMap<Long/* brokerId */, String/* broker address */> brokerAddrs;
 
     public String selectBrokerAddr() {

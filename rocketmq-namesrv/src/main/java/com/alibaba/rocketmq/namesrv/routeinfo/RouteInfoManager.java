@@ -141,7 +141,7 @@ public class RouteInfoManager {
                 registerFirst = registerFirst || (null == oldAddr);
 
 
-                if (null != topicConfigWrapper //
+                if (null != topicConfigWrapper //只有是master的broker才能注册topicQueueTable
                         && MixAll.MASTER_ID == brokerId) {
                     if (this.isBrokerTopicConfigChanged(brokerAddr, topicConfigWrapper.getDataVersion())//
                             || registerFirst) {
