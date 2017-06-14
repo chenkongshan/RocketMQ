@@ -367,6 +367,15 @@ public class RouteInfoManager {
         }
     }
 
+    /**
+     * 主要就是根据topic获取对应的queue和broker地址
+     * 1、topicQueueTable，topic--->List<QueueData>
+     * 2、QueueData.brokerName-->BrokerData
+     * 3.BrokerData.brokerAddr-->List<filterServerAddr>
+     *
+     * @param topic
+     * @return
+     */
     public TopicRouteData pickupTopicRouteData(final String topic) {
         TopicRouteData topicRouteData = new TopicRouteData();
         boolean foundQueueData = false;

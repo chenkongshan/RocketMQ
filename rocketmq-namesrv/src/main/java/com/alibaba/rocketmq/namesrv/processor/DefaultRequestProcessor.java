@@ -195,6 +195,7 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
                 ctx.channel()// 7
         );
 
+        //slave broker在registerBroker的时候，会同时获取到master的brokerAddr以及HaServerAddr
         responseHeader.setHaServerAddr(result.getHaServerAddr());
         responseHeader.setMasterAddr(result.getMasterAddr());
 
