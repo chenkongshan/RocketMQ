@@ -41,6 +41,8 @@ public class ConsumerGroupInfo {
     private final String groupName;
     private final ConcurrentHashMap<String/* Topic */, SubscriptionData> subscriptionTable =
             new ConcurrentHashMap<String, SubscriptionData>();
+    //ClientChannelInfo中有属性clientId，也就是说相同group的Consumer可能存在于同一个JVM上，但是设置的instanceName不同，
+    //因此被当做了不同的Consumer实例来对待
     private final ConcurrentHashMap<Channel, ClientChannelInfo> channelInfoTable =
             new ConcurrentHashMap<Channel, ClientChannelInfo>(16);
     private volatile ConsumeType consumeType;
@@ -188,6 +190,9 @@ public class ConsumerGroupInfo {
 
 
         //集群状态下，相同group的消费者，如果订阅不同的topic，会导致新发送的heart beat把old topic移除掉
+        //上述不算完整，实际情况是，一个group集群是可以订阅多个topic，这个要求一个group集群下的所有消费者订阅的topic是相同的，
+        //不允许订阅的topic不同，例如A订阅aa,B订阅bb，这样是不行的，后来的heartbeat会把前面的topic信息给覆盖掉，但是
+        //A订阅aa和bb，B订阅aa和bb，这样是可行的
         Iterator<Entry<String, SubscriptionData>> it = this.subscriptionTable.entrySet().iterator();
         while (it.hasNext()) {
             Entry<String, SubscriptionData> next = it.next();

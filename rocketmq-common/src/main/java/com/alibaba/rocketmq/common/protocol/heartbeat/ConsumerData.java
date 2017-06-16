@@ -36,6 +36,7 @@ public class ConsumerData {
     private ConsumeFromWhere consumeFromWhere;
     //为什么是Set？一个group中，一个JVM应该只有一个group consumer，一个consumer应该只有一个topic和tags
     //我觉得，可能是因为一个应用中一个consumer会调用多次subscribe方法来多次注册topic和tags，并且topic和tags不相同
+    //一个consumer可以调用subscribe方法订阅多个topic
     private Set<SubscriptionData> subscriptionDataSet = new HashSet<SubscriptionData>();
     private boolean unitMode;
 

@@ -25,7 +25,7 @@ import io.netty.channel.Channel;
  */
 public class ClientChannelInfo {
     private final Channel channel;
-    private final String clientId;
+    private final String clientId;//存在此属性，就可以在一个JVM上相同group设置多个Consumer实例，只要设置的instanceName不同即可
     private final LanguageCode language;
     private final int version;
     private volatile long lastUpdateTimestamp = System.currentTimeMillis();

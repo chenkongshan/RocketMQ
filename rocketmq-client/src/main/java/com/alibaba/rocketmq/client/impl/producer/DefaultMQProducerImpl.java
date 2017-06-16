@@ -128,8 +128,14 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                     this.defaultMQProducer.changeInstanceNameToPID();
                 }
 
+                /**
+                 * 只要是instanceName不同，则就可以拥有单独的MQClientInstance，也就是说一个JVM上是可以存在多个group的client，
+                 * 只要client设置单独的instanceName即可，如果不设置instanceName，则默认instanceName设置的是当前应用的PID，
+                 * 此时相当于多个client公用一个MQClientInstance，这个时候是不可以有多个grup的
+                 */
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQProducer, rpcHook);
 
+                //Producer也是用group来进行区分的
                 boolean registerOK = mQClientFactory.registerProducer(this.defaultMQProducer.getProducerGroup(), this);
                 if (!registerOK) {
                     this.serviceState = ServiceState.CREATE_JUST;

@@ -488,6 +488,7 @@ public class MQClientInstance {
                         if (!changed) {
                             //实际上是看看DefaultMQPushConsumerImpl中的RebalanceImpl中ConcurrentHashMap<String/* topic */, Set<MessageQueue>> topicSubscribeInfoTable
                             //是否不包含新增的topic
+                            //Consumer中，若subscriptionInner中包含topic，但是topicSubscribeInfoTable中不包含topic，则需要更新
                             changed = this.isNeedUpdateTopicRouteInfo(topic);
                         } else {
                             log.info("the topic[{}] route info changed, old[{}] ,new[{}]", topic, old, topicRouteData);
