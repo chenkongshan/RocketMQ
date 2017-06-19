@@ -285,6 +285,7 @@ public class MQClientInstance {
             }
         }
 
+        //集合所有的Consumer和Producer的topic
         for (String topic : topicList) {
             this.updateTopicRouteInfoFromNameServer(topic);
         }
@@ -496,6 +497,7 @@ public class MQClientInstance {
                             //实际上是看看DefaultMQPushConsumerImpl中的RebalanceImpl中ConcurrentHashMap<String/* topic */, Set<MessageQueue>> topicSubscribeInfoTable
                             //是否不包含新增的topic
                             //Consumer中，若subscriptionInner中包含topic，但是topicSubscribeInfoTable中不包含topic，则需要更新
+                            //Producer中，判断topicPublishInfoTable中是否不存在当前topic对应的数据
                             changed = this.isNeedUpdateTopicRouteInfo(topic);
                         } else {
                             log.info("the topic[{}] route info changed, old[{}] ,new[{}]", topic, old, topicRouteData);
@@ -517,6 +519,7 @@ public class MQClientInstance {
                                     Entry<String, MQProducerInner> entry = it.next();
                                     MQProducerInner impl = entry.getValue();
                                     if (impl != null) {
+                                        //更新DefaultMQProducerImpl的topicPublishInfoTable
                                         impl.updateTopicPublishInfo(topic, publishInfo);
                                     }
                                 }
@@ -708,6 +711,7 @@ public class MQClientInstance {
             List<QueueData> qds = route.getQueueDatas();
             Collections.sort(qds);
             for (QueueData qd : qds) {
+                //Producer需要的Queue必须是可写入的
                 if (PermName.isWriteable(qd.getPerm())) {
                     BrokerData brokerData = null;
                     for (BrokerData bd : route.getBrokerDatas()) {
@@ -721,6 +725,7 @@ public class MQClientInstance {
                         continue;
                     }
 
+                    //Producer写入Queue的broker必须存在master broker
                     if (!brokerData.getBrokerAddrs().containsKey(MixAll.MASTER_ID)) {
                         continue;
                     }
@@ -742,6 +747,7 @@ public class MQClientInstance {
         Set<MessageQueue> mqList = new HashSet<MessageQueue>();
         List<QueueData> qds = route.getQueueDatas();
         for (QueueData qd : qds) {
+            //Consumer关注的是Queue是否可读，并且可以从slave broker读取
             if (PermName.isReadable(qd.getPerm())) {
                 for (int i = 0; i < qd.getReadQueueNums(); i++) {
                     MessageQueue mq = new MessageQueue(topic, qd.getBrokerName(), i);
