@@ -145,6 +145,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 }
 
                 //ConcurrentHashMap<String/* topic */, TopicPublishInfo> topicPublishInfoTable
+                //DEFAULT_TOPIC="TBW102"
                 this.topicPublishInfoTable.put(this.defaultMQProducer.getCreateTopicKey(), new TopicPublishInfo());
 
                 if (startFactory) {

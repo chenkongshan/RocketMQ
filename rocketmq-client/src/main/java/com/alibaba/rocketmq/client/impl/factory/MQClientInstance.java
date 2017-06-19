@@ -152,7 +152,14 @@ public class MQClientInstance {
                     }
                     // Start request-response channel
                     this.mQClientAPIImpl.start();
-                    // Start various schedule tasks
+
+                    // Start various [ˈvɛriəs, ˈvær-] schedule tasks
+                    /**
+                     * updateTopicRouteInfoFromNameServer每30秒
+                     * sendHeartbeatToAllBrokerWithLock每30秒
+                     * persistAllConsumerOffset每5秒
+                     * adjustThreadPool每1分钟
+                     */
                     this.startScheduledTask();
                     // Start pull service
                     this.pullMessageService.start();
@@ -201,7 +208,7 @@ public class MQClientInstance {
                     log.error("ScheduledTask updateTopicRouteInfoFromNameServer exception", e);
                 }
             }
-        }, 10, this.clientConfig.getPollNameServerInteval(), TimeUnit.MILLISECONDS);
+        }, 10, this.clientConfig.getPollNameServerInteval()/*1000 * 30*/, TimeUnit.MILLISECONDS);
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -214,7 +221,7 @@ public class MQClientInstance {
                     log.error("ScheduledTask sendHeartbeatToAllBroker exception", e);
                 }
             }
-        }, 1000, this.clientConfig.getHeartbeatBrokerInterval(), TimeUnit.MILLISECONDS);
+        }, 1000, this.clientConfig.getHeartbeatBrokerInterval()/*1000 * 30*/, TimeUnit.MILLISECONDS);
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
@@ -226,7 +233,7 @@ public class MQClientInstance {
                     log.error("ScheduledTask persistAllConsumerOffset exception", e);
                 }
             }
-        }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval(), TimeUnit.MILLISECONDS);
+        }, 1000 * 10, this.clientConfig.getPersistConsumerOffsetInterval()/* [pɚˈsɪst, -ˈzɪst] 1000 * 5*/, TimeUnit.MILLISECONDS);
 
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
