@@ -431,13 +431,14 @@ public class DefaultMQProducerImpl implements MQProducerInner {
         long beginTimestampFirst = System.currentTimeMillis();
         long beginTimestampPrev = beginTimestampFirst;
         long endTimestamp = beginTimestampFirst;
+        //这个操作，如果broker不存在topic，并且broker是允许新建topic的，则会新建topic信息（其实不是直接新建，而是间接新建topic）
         TopicPublishInfo topicPublishInfo = this.tryToFindTopicPublishInfo(msg.getTopic());
         if (topicPublishInfo != null && topicPublishInfo.ok()) {
             MessageQueue mq = null;
             Exception exception = null;
             SendResult sendResult = null;
             //默认是同步方式，因此总共次数是3次
-            int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed() : 1;
+            int timesTotal = communicationMode == CommunicationMode.SYNC ? 1 + this.defaultMQProducer.getRetryTimesWhenSendFailed()/*default is 2*/ : 1;
             int times = 0;
             String[] brokersSent = new String[timesTotal];
             for (; times < timesTotal; times++) {
@@ -593,6 +594,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
             byte[] prevBody = msg.getBody();
             try {
 
+                //设置msg的UNIQ_KEY
                 MessageClientIDSetter.setUniqID(msg);
 
                 int sysFlag = 0;

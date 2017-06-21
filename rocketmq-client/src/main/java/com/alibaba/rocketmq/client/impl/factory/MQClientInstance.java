@@ -478,11 +478,13 @@ public class MQClientInstance {
                 try {
                     TopicRouteData topicRouteData;
                     if (isDefault && defaultMQProducer != null) {
+                        //DEFAULT_TOPIC = TBW102
+                        //如果broker允许新建topic，由于是使用DEFAULT_TOPIC来获取路由信息的，因此能获取到所有broker的路由信息
                         topicRouteData = this.mQClientAPIImpl.getDefaultTopicRouteInfoFromNameServer(defaultMQProducer.getCreateTopicKey(),
                                 1000 * 3);
                         if (topicRouteData != null) {
                             for (QueueData data : topicRouteData.getQueueDatas()) {
-                                int queueNums = Math.min(defaultMQProducer.getDefaultTopicQueueNums(), data.getReadQueueNums());
+                                int queueNums = Math.min(defaultMQProducer.getDefaultTopicQueueNums()/*default is 4*/, data.getReadQueueNums()/*default is 8*/);
                                 data.setReadQueueNums(queueNums);
                                 data.setWriteQueueNums(queueNums);
                             }
