@@ -277,6 +277,8 @@ public class SendMessageProcessor extends AbstractSendMessageProcessor implement
         }
 
         response.setCode(-1);
+        //默认topic不能发送消息，若topic不存在并且broker允许创建新的topic，
+        // 则创建新的topic信息，检查选择的queueId是否不大于topic对应的read和write的队列数量
         super.msgCheck(ctx, requestHeader, response);
         if (response.getCode() != -1) {
             return response;

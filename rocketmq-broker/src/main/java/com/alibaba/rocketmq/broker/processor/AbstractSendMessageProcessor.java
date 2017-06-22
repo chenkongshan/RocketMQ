@@ -167,6 +167,7 @@ public abstract class AbstractSendMessageProcessor implements NettyRequestProces
 
     protected RemotingCommand msgCheck(final ChannelHandlerContext ctx,
                                        final SendMessageRequestHeader requestHeader, final RemotingCommand response) {
+        //broker不能写入并且topic是顺序消息
         if (!PermName.isWriteable(this.brokerController.getBrokerConfig().getBrokerPermission())
                 && this.brokerController.getTopicConfigManager().isOrderTopic(requestHeader.getTopic())) {
             response.setCode(ResponseCode.NO_PERMISSION);
@@ -174,6 +175,7 @@ public abstract class AbstractSendMessageProcessor implements NettyRequestProces
                     + "] sending message is forbidden");
             return response;
         }
+        //其实就是判断传入的topic是不是DEFAULT_TOPIC=TBW102，如果是默认topic则不能发送message
         if (!this.brokerController.getTopicConfigManager().isTopicCanSendMessage(requestHeader.getTopic())) {
             String errorMsg =
                     "the topic[" + requestHeader.getTopic() + "] is conflict with system reserved words.";
@@ -185,6 +187,7 @@ public abstract class AbstractSendMessageProcessor implements NettyRequestProces
 
         TopicConfig topicConfig =
                 this.brokerController.getTopicConfigManager().selectTopicConfig(requestHeader.getTopic());
+        //可能是一个新的topic，此时broker还没有创建此topic
         if (null == topicConfig) {
             int topicSysFlag = 0;
             if (requestHeader.isUnitMode()) {
@@ -197,11 +200,13 @@ public abstract class AbstractSendMessageProcessor implements NettyRequestProces
 
             log.warn("the topic " + requestHeader.getTopic() + " not exist, producer: "
                     + ctx.channel().remoteAddress());
+            //如果broker不存在topic，并且broker允许创建新的topic，则创建topic信息
             topicConfig = this.brokerController.getTopicConfigManager().createTopicInSendMessageMethod(//
                     requestHeader.getTopic(), //
-                    requestHeader.getDefaultTopic(), //
+                    requestHeader.getDefaultTopic(), //TBW102
                     RemotingHelper.parseChannelRemoteAddr(ctx.channel()), //
-                    requestHeader.getDefaultTopicQueueNums(), topicSysFlag);
+                    requestHeader.getDefaultTopicQueueNums(), //4
+                    topicSysFlag);
 
             if (null == topicConfig) {
                 if (requestHeader.getTopic().startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)) {

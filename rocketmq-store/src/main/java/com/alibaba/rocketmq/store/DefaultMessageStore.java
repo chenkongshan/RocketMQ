@@ -310,7 +310,7 @@ public class DefaultMessageStore implements MessageStore {
 
         if (msg.getTopic().length() > Byte.MAX_VALUE) {
             log.warn("putMessage message topic length too long " + msg.getTopic().length());
-            return new PutMessageResult(PutMessageStatus.MESSAGE_ILLEGAL, null);
+            return new PutMessageResult(PutMessageStatus.MESSAGE_ILLEGAL/*[ɪˈliɡəl] 非法的*/, null);
         }
 
 
