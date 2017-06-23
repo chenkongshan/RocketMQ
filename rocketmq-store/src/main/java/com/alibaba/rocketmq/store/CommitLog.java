@@ -124,6 +124,7 @@ public class CommitLog {
 
 
     public SelectMapedBufferResult getData(final long offset, final boolean returnFirstOnNotFound) {
+        //default is 1024 * 1024 * 1024 = 1GB
         int mapedFileSize = this.defaultMessageStore.getMessageStoreConfig().getMapedFileSizeCommitLog();
         MapedFile mapedFile = this.mapedFileQueue.findMapedFileByOffset(offset, returnFirstOnNotFound);
         if (mapedFile != null) {
