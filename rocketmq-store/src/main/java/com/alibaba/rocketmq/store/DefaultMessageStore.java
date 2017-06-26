@@ -1694,6 +1694,13 @@ public class DefaultMessageStore implements MessageStore {
                         this.reputFromOffset = result.getStartOffset();
 
                         for (int readSize = 0; readSize < result.getSize() && doNext; ) {
+                            /**
+                             * 几种返回情况：
+                             * 1、到达文件尾部：true，size=0
+                             * 2、出现错误：false，size=-1
+                             * 3、message的大小不正确，false，size=messageSize
+                             * 4、正常情况，true，并且传出其他message的属性
+                             */
                             DispatchRequest dispatchRequest =
                                     DefaultMessageStore.this.commitLog.checkMessageAndReturnSize(result.getByteBuffer(), false, false);
                             int size = dispatchRequest.getMsgSize();
