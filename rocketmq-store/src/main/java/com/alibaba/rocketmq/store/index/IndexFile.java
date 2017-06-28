@@ -102,8 +102,23 @@ public class IndexFile {
         return this.mapedFile.destroy(intervalForcibly);
     }
 
+    /**
+     * 存储分为3部分：
+     * *******indexHeader******hashSlot*****************index******
+     * *******40bytes*********5000000*4bytes*********5000000*4*20bytes*****
+     * indexHeader:begTimeStamp,endTimeStamp,begPhyOffset,endPhyOffset,hashSlotNum,indexNum
+     * hashSlot存储的内容：使用key的hash%hashSlotNum计算出hashSlot的位置，当前位置存储的值是上一个hash值存储的当时的index数量
+     * index存储内容：
+     * ***int keyHash****long phyOffset***int timeDiff****int 前index的数量*****
+     *
+     * @param key topic#messageUniqKey，也有可能是topic#key，这个key是发送message是指定的keys，使用“ ”分割
+     * @param phyOffset commitLog offset
+     * @param storeTimestamp
+     * @return
+     */
     public boolean putKey(final String key, final long phyOffset, final long storeTimestamp) {
         if (this.indexHeader.getIndexCount() < this.indexNum) {
+            //获取key的hash值的绝对值
             int keyHash = indexKeyHashMethod(key);
             int slotPos = keyHash % this.hashSlotNum;
             int absSlotPos = IndexHeader.INDEX_HEADER_SIZE + slotPos * HASH_SLOT_SIZE;
@@ -152,7 +167,9 @@ public class IndexFile {
                     this.indexHeader.setBeginTimestamp(storeTimestamp);
                 }
 
+                //这个是从0开始增长
                 this.indexHeader.incHashSlotCount();
+                //这个是从1开始增长
                 this.indexHeader.incIndexCount();
                 this.indexHeader.setEndPhyOffset(phyOffset);
                 this.indexHeader.setEndTimestamp(storeTimestamp);
@@ -179,7 +196,7 @@ public class IndexFile {
 
     public int indexKeyHashMethod(final String key) {
         int keyHash = key.hashCode();
-        int keyHashPositive = Math.abs(keyHash);
+        int keyHashPositive = Math.abs(keyHash);/* [ˈpɑ:zətɪv] 积极的，正面，正的*/
         if (keyHashPositive < 0)
             keyHashPositive = 0;
         return keyHashPositive;

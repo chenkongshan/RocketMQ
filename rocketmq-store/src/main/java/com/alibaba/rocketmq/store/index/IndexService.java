@@ -234,6 +234,7 @@ public class IndexService {
             }
 
             if (req.getUniqKey() != null) {
+                //根据message uniqKey构建索引文件
                 indexFile = putKey(indexFile, msg, /*topic + "#" + uniqKey*/buildKey(topic, req.getUniqKey()));
                 if (indexFile == null) {
                     log.error("putKey error commitlog {} uniqkey {}", req.getCommitLogOffset(), req.getUniqKey());
@@ -262,7 +263,7 @@ public class IndexService {
     }
 
 
-    private IndexFile putKey(IndexFile indexFile, DispatchRequest msg, String idxKey) {
+    private IndexFile putKey(IndexFile indexFile, DispatchRequest msg, String idxKey/*topic + "#" + uniqKey*/) {
         for (boolean ok =
                 indexFile.putKey(idxKey, msg.getCommitLogOffset(),
                     msg.getStoreTimestamp()); !ok;) {
@@ -307,6 +308,10 @@ public class IndexService {
     }
 
 
+    /**
+     * 找到最后的一个IndexFile，如果不存在则根据当前的yyyyMMddHHmmssSSS新建一个IndexFile
+     * @return
+     */
     public IndexFile getAndCreateLastIndexFile() {
         IndexFile indexFile = null;
         IndexFile prevIndexFile = null;

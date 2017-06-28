@@ -1314,6 +1314,7 @@ public class DefaultMessageStore implements MessageStore {
 
         //default is true
         if (DefaultMessageStore.this.getMessageStoreConfig().isMessageIndexEnable()) {
+            //使用topic#uniqKey和topic#key构建索引
             DefaultMessageStore.this.indexService.buildIndex(req);
         }
     }
@@ -1711,7 +1712,8 @@ public class DefaultMessageStore implements MessageStore {
                                     DefaultMessageStore.this.doDispatch(dispatchRequest);
 
                                     if (BrokerRole.SLAVE != DefaultMessageStore.this.getMessageStoreConfig().getBrokerRole()
-                                            && DefaultMessageStore.this.brokerConfig.isLongPollingEnable()) {
+                                            && DefaultMessageStore.this.brokerConfig.isLongPollingEnable()/*default is true*/) {
+                                        //todo
                                         DefaultMessageStore.this.messageArrivingListener.arriving(dispatchRequest.getTopic(),
                                                 dispatchRequest.getQueueId(), dispatchRequest.getConsumeQueueOffset() + 1,
                                                 dispatchRequest.getTagsCode());
