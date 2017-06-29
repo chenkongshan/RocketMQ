@@ -388,7 +388,6 @@ public class DefaultMessageStore implements MessageStore {
 
         GetMessageResult getResult = new GetMessageResult();
 
-
         final long maxOffsetPy = this.commitLog.getMaxOffset();
 
         ConsumeQueue consumeQueue = findConsumeQueue(topic, queueId);
@@ -1711,9 +1710,9 @@ public class DefaultMessageStore implements MessageStore {
                                     //添加message到ConsumeQueue，并且构建index
                                     DefaultMessageStore.this.doDispatch(dispatchRequest);
 
+                                    //当前broker不是slave并且DefaultMessageStore中配置为允许长轮询
                                     if (BrokerRole.SLAVE != DefaultMessageStore.this.getMessageStoreConfig().getBrokerRole()
                                             && DefaultMessageStore.this.brokerConfig.isLongPollingEnable()/*default is true*/) {
-                                        //todo
                                         DefaultMessageStore.this.messageArrivingListener.arriving(dispatchRequest.getTopic(),
                                                 dispatchRequest.getQueueId(), dispatchRequest.getConsumeQueueOffset() + 1,
                                                 dispatchRequest.getTagsCode());

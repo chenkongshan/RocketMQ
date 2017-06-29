@@ -40,9 +40,9 @@ public class GetMessageResult {
 
     private int bufferTotalSize = 0;
 
-    private boolean suggestPullingFromSlave = false;
+    private boolean suggestPullingFromSlave/*[səɡˈdʒɛst, səˈdʒɛst] 建议*/ = false;
 
-    private int msgCount4Commercial = 0;
+    private int msgCount4Commercial/*[kəˈmɜ:rʃl]  商业的*/ = 0;
 
 
     public GetMessageResult() {

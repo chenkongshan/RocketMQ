@@ -95,7 +95,7 @@ public class PullMessageProcessor implements NettyRequestProcessor {
             log.debug("receive PullMessage request command, " + request);
         }
 
-
+        //当前broker不可读，返回无权限消息
         if (!PermName.isReadable(this.brokerController.getBrokerConfig().getBrokerPermission())) {
             response.setCode(ResponseCode.NO_PERMISSION);
             response.setRemark("the broker[" + this.brokerController.getBrokerConfig().getBrokerIP1() + "] pulling message is forbidden");
@@ -112,7 +112,7 @@ public class PullMessageProcessor implements NettyRequestProcessor {
             return response;
         }
 
-
+        //SubscribtionGroupConfig配置为不可消费
         if (!subscriptionGroupConfig.isConsumeEnable()) {
             response.setCode(ResponseCode.NO_PERMISSION);
             response.setRemark("subscription group no permission, " + requestHeader.getConsumerGroup());
@@ -439,6 +439,8 @@ public class PullMessageProcessor implements NettyRequestProcessor {
         }
         return response;
     }
+    //end of processRequest(final Channel channel, RemotingCommand request, boolean brokerAllowSuspend)
+    //**************************************************************************************************************************************
 
 
     public boolean hasConsumeMessageHook() {

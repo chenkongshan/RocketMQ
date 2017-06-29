@@ -100,6 +100,7 @@ public class PullRequestHoldService extends ServiceThread {
             if (kArray != null && 2 == kArray.length) {
                 String topic = kArray[0];
                 int queueId = Integer.parseInt(kArray[1]);
+                //这个并不是ConsumeQueue的物理偏移量，而是使用物理偏移量/记录大小 而得到的元素的位置偏移
                 final long offset = this.brokerController.getMessageStore().getMaxOffsetInQuque(topic, queueId);
                 this.notifyMessageArriving(topic, queueId, offset);
             }
@@ -111,6 +112,7 @@ public class PullRequestHoldService extends ServiceThread {
     }
 
     public void notifyMessageArriving(final String topic, final int queueId, final long maxOffset, final Long tagsCode) {
+        //topic@queueId
         String key = this.buildKey(topic, queueId);
         ManyPullRequest mpr = this.pullRequestTable.get(key);
         if (mpr != null) {
@@ -130,6 +132,7 @@ public class PullRequestHoldService extends ServiceThread {
                             // tmp = getLatestMessageTagsCode(topic, queueId,
                             // maxOffset);
                         }
+                        //这个是用tags的hashCode来进行比对的，因此有可能会出现hash碰撞，因此在消费的时候，最好再使用tags过滤一次
                         if (this.messageFilter.isMessageMatched(request.getSubscriptionData(), tmp)) {
                             try {
                                 this.brokerController.getPullMessageProcessor().excuteRequestWhenWakeup(request.getClientChannel(),
@@ -141,7 +144,7 @@ public class PullRequestHoldService extends ServiceThread {
                         }
                     }
 
-
+                    //过期请求
                     if (System.currentTimeMillis() >= (request.getSuspendTimestamp() + request.getTimeoutMillis())) {
                         try {
                             this.brokerController.getPullMessageProcessor().excuteRequestWhenWakeup(request.getClientChannel(),
