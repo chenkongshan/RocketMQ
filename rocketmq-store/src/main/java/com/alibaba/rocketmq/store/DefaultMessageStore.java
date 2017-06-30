@@ -393,11 +393,12 @@ public class DefaultMessageStore implements MessageStore {
         ConsumeQueue consumeQueue = findConsumeQueue(topic, queueId);
         if (consumeQueue != null) {
             minOffset = consumeQueue.getMinOffsetInQuque();
+            //这些计算的都是逻辑偏移量
             maxOffset = consumeQueue.getMaxOffsetInQuque();
 
             if (maxOffset == 0) {
                 status = GetMessageStatus.NO_MESSAGE_IN_QUEUE;
-                nextBeginOffset = nextOffsetCorrection(offset, 0);
+                nextBeginOffset = nextOffsetCorrection(offset, 0);/*[kəˈrɛkʃən] 校正*/
             } else if (offset < minOffset) {
                 status = GetMessageStatus.OFFSET_TOO_SMALL;
                 nextBeginOffset = nextOffsetCorrection(offset, minOffset);
@@ -445,7 +446,7 @@ public class DefaultMessageStore implements MessageStore {
                                 break;
                             }
 
-                            //使用tags过滤消息
+                            //使用tags的hashCode过滤消息，同一个topic，并且tags很多时，可能会出现hash碰撞
                             if (this.messageFilter.isMessageMatched(subscriptionData, tagsCode)) {
                                 SelectMapedBufferResult selectResult = this.commitLog.getMessage(offsetPy, sizePy);
                                 if (selectResult != null) {
@@ -482,6 +483,7 @@ public class DefaultMessageStore implements MessageStore {
 
 
                         long diff = maxOffsetPy - maxPhyOffsetPulling;
+                        //这个是计算磁盘占用达到40%时，建议从slave服务器读取消息
                         long memory = (long) (StoreUtil.TotalPhysicalMemorySize
                                 * (this.messageStoreConfig.getAccessMessageInMemoryMaxRatio() / 100.0));
                         getResult.setSuggestPullingFromSlave(diff > memory);
@@ -509,7 +511,7 @@ public class DefaultMessageStore implements MessageStore {
             this.storeStatsService.getGetMessageTimesTotalMiss().incrementAndGet();
         }
         long eclipseTime = this.getSystemClock().now() - beginTime;
-        this.storeStatsService.setGetMessageEntireTimeMax(eclipseTime);
+        this.storeStatsService.setGetMessageEntireTimeMax(eclipseTime);/* [ɛnˈtaɪr] 整个的*/
 
         getResult.setStatus(status);
         getResult.setNextBeginOffset(nextBeginOffset);
@@ -1040,7 +1042,7 @@ public class DefaultMessageStore implements MessageStore {
 
     private long nextOffsetCorrection(long oldOffset, long newOffset) {
         long nextOffset = oldOffset;
-        if (this.getMessageStoreConfig().getBrokerRole() != BrokerRole.SLAVE || this.getMessageStoreConfig().isOffsetCheckInSlave()) {
+        if (this.getMessageStoreConfig().getBrokerRole() != BrokerRole.SLAVE || this.getMessageStoreConfig().isOffsetCheckInSlave()/*false*/) {
             nextOffset = newOffset;
         }
         return nextOffset;
@@ -1073,7 +1075,7 @@ public class DefaultMessageStore implements MessageStore {
         }
 
         else {
-            if ((bufferTotal + sizePy) > this.messageStoreConfig.getMaxTransferBytesOnMessageInMemory()) {
+            if ((bufferTotal + sizePy) > this.messageStoreConfig.getMaxTransferBytesOnMessageInMemory()/*1024 * 256*/) {
                 return true;
             }
 
