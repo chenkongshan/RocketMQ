@@ -394,6 +394,7 @@ public class DefaultMessageStore implements MessageStore {
         if (consumeQueue != null) {
             minOffset = consumeQueue.getMinOffsetInQuque();
             //这些计算的都是逻辑偏移量
+            //这个是wrotePosition,是下一个消息写入的offset
             maxOffset = consumeQueue.getMaxOffsetInQuque();
 
             if (maxOffset == 0) {
@@ -413,6 +414,7 @@ public class DefaultMessageStore implements MessageStore {
                     nextBeginOffset = nextOffsetCorrection(offset, maxOffset);
                 }
             } else {
+                //从offset到wrotePosition之间的所有byte数据
                 SelectMapedBufferResult bufferConsumeQueue = consumeQueue.getIndexBuffer(offset);
                 if (bufferConsumeQueue != null) {
                     try {
@@ -438,7 +440,7 @@ public class DefaultMessageStore implements MessageStore {
                                     continue;
                             }
 
-
+                            //校验差额是否大于物理存储的40%
                             boolean isInDisk = checkInDiskByCommitOffset(offsetPy, maxOffsetPy);
 
                             if (this.isTheBatchFull(sizePy, maxMsgNums, getResult.getBufferTotalSize(), getResult.getMessageCount(),
@@ -1048,6 +1050,12 @@ public class DefaultMessageStore implements MessageStore {
         return nextOffset;
     }
 
+    /**
+     * 校验maxOffsetPy与offsetPy的差额是否大于物理存储的40%
+     * @param offsetPy
+     * @param maxOffsetPy
+     * @return
+     */
     private boolean checkInDiskByCommitOffset(long offsetPy, long maxOffsetPy) {
         long memory = (long) (StoreUtil.TotalPhysicalMemorySize * (this.messageStoreConfig.getAccessMessageInMemoryMaxRatio() / 100.0));
         return (maxOffsetPy - offsetPy) > memory;
@@ -1065,11 +1073,11 @@ public class DefaultMessageStore implements MessageStore {
 
 
         if (isInDisk) {
-            if ((bufferTotal + sizePy) > this.messageStoreConfig.getMaxTransferBytesOnMessageInDisk()) {
+            if ((bufferTotal + sizePy) > this.messageStoreConfig.getMaxTransferBytesOnMessageInDisk()/*1024 * 64*/) {
                 return true;
             }
 
-            if ((messageTotal + 1) > this.messageStoreConfig.getMaxTransferCountOnMessageInDisk()) {
+            if ((messageTotal + 1) > this.messageStoreConfig.getMaxTransferCountOnMessageInDisk()/*8*/) {
                 return true;
             }
         }
@@ -1079,7 +1087,7 @@ public class DefaultMessageStore implements MessageStore {
                 return true;
             }
 
-            if ((messageTotal + 1) > this.messageStoreConfig.getMaxTransferCountOnMessageInMemory()) {
+            if ((messageTotal + 1) > this.messageStoreConfig.getMaxTransferCountOnMessageInMemory()/*32*/) {
                 return true;
             }
         }

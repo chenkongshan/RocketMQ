@@ -158,12 +158,12 @@ public class MQClientInstance {
                      * updateTopicRouteInfoFromNameServer每30秒
                      * sendHeartbeatToAllBrokerWithLock每30秒
                      * persistAllConsumerOffset每5秒
-                     * adjustThreadPool每1分钟
+                     * adjustThreadPool每1分钟，这个定时任务没什么用，都是空实现
                      */
                     this.startScheduledTask();
                     // Start pull service
                     this.pullMessageService.start();
-                    // Start rebalance service
+                    // Start rebalance service,execute every 20000 milliseconds
                     this.rebalanceService.start();
                     // Start push service
                     this.defaultMQProducer.getDefaultMQProducerImpl().start(false);
@@ -240,7 +240,8 @@ public class MQClientInstance {
             @Override
             public void run() {
                 try {
-                    MQClientInstance.this.adjustThreadPool();
+                    //这个定时任务都是空实现
+                    MQClientInstance.this.adjustThreadPool();/* [əˈdʒʌst] 调整 校正*/
                 } catch (Exception e) {
                     log.error("ScheduledTask adjustThreadPool exception", e);
                 }

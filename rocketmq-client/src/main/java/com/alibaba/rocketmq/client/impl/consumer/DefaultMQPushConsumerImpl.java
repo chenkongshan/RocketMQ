@@ -191,6 +191,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
 
     /**
      * 这个是关键的方法，用来pull message
+     *
      * @param pullRequest
      */
     public void pullMessage(final PullRequest pullRequest) {
@@ -581,7 +582,7 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
                             break;
                     }
                 }
-                //空实现
+                //RemoteBrokerOffsetStore空实现
                 this.offsetStore.load();
 
                 if (this.getMessageListenerInner() instanceof MessageListenerOrderly) {
@@ -1033,18 +1034,20 @@ public class DefaultMQPushConsumerImpl implements MQConsumerInner {
     }
 
     public void adjustThreadPool() {
-        long computeAccTotal = this.computeAccumulationTotal();
-        long adjustThreadPoolNumsThreshold = this.defaultMQPushConsumer.getAdjustThreadPoolNumsThreshold();
+        long computeAccTotal = this.computeAccumulationTotal();/* [əˌkjumjəˈleʃən] 积累*/
+        long adjustThreadPoolNumsThreshold = this.defaultMQPushConsumer.getAdjustThreadPoolNumsThreshold();/* default is 100000*/
 
         long incThreshold = (long) (adjustThreadPoolNumsThreshold * 1.0);
 
         long decThreshold = (long) (adjustThreadPoolNumsThreshold * 0.8);
 
         if (computeAccTotal >= incThreshold) {
+            //ConsumeMessageConcurrentlyService是空实现
             this.consumeMessageService.incCorePoolSize();
         }
 
         if (computeAccTotal < decThreshold) {
+            //ConsumeMessageConcurrentlyService是空实现
             this.consumeMessageService.decCorePoolSize();
         }
     }

@@ -335,6 +335,7 @@ public abstract class RebalanceImpl {
             MessageQueue mq = next.getKey();
             ProcessQueue pq = next.getValue();
 
+            //rebalance得到的mqSet中不包含当前mq，则移除
             if (mq.getTopic().equals(topic)) {
                 if (!mqSet.contains(mq)) {
                     pq.setDropped(true);
@@ -347,7 +348,7 @@ public abstract class RebalanceImpl {
                     switch (this.consumeType()) {
                         case CONSUME_ACTIVELY:
                             break;
-                        case CONSUME_PASSIVELY:
+                        case CONSUME_PASSIVELY:/* ['pæsɪvlɪ] 被动*/
                             pq.setDropped(true);
                             if (this.removeUnnecessaryMessageQueue(mq, pq)) {
                                 it.remove();
@@ -371,6 +372,7 @@ public abstract class RebalanceImpl {
                     continue;
                 }
 
+                //其实只是移除本地offsetStore中的offset信息
                 this.removeDirtyOffset(mq);
                 ProcessQueue pq = new ProcessQueue();
                 long nextOffset = this.computePullFromWhere(mq);

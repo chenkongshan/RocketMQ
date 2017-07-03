@@ -121,6 +121,7 @@ public class PullMessageProcessor implements NettyRequestProcessor {
 
         final boolean hasSuspendFlag = PullSysFlag.hasSuspendFlag(requestHeader.getSysFlag());
         final boolean hasCommitOffsetFlag = PullSysFlag.hasCommitOffsetFlag(requestHeader.getSysFlag());
+        //默认情况下，hasSubscriptionFlag是false
         final boolean hasSubscriptionFlag = PullSysFlag.hasSubscriptionFlag(requestHeader.getSysFlag());
 
         //default is 1000 * 15

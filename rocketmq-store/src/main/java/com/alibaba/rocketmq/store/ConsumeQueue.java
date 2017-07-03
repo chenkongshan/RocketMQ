@@ -142,6 +142,7 @@ public class ConsumeQueue {
     }
 
     public long getOffsetInQueueByTime(final long timestamp) {
+        //使用file的lastModified，在linux环境下才有效
         MapedFile mapedFile = this.mapedFileQueue.getMapedFileByTime(timestamp);
         if (mapedFile != null) {
             long offset = 0;

@@ -136,6 +136,8 @@ public class RebalancePushImpl extends RebalanceImpl {
                         result = 0L;
                     } else {
                         try {
+                            //这个是从DefaultMessageStore的consumeQueueTable中获取到最大偏移量
+                            //ConcurrentHashMap<String/* topic */, ConcurrentHashMap<Integer/* queueId */, ConsumeQueue>> consumeQueueTable
                             result = this.mQClientFactory.getMQAdminImpl().maxOffset(mq);
                         } catch (MQClientException e) {
                             result = -1;
@@ -170,6 +172,7 @@ public class RebalancePushImpl extends RebalanceImpl {
                         }
                     } else {
                         try {
+                            //默认的开始时间是半小时之前
                             long timestamp = UtilAll.parseDate(this.defaultMQPushConsumerImpl.getDefaultMQPushConsumer().getConsumeTimestamp(),
                                     UtilAll.yyyyMMddHHmmss).getTime();
                             result = this.mQClientFactory.getMQAdminImpl().searchOffset(mq, timestamp);

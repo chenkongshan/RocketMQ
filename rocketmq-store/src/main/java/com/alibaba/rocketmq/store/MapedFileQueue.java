@@ -97,6 +97,7 @@ public class MapedFileQueue {
 
         for (int i = 0; i < mfs.length; i++) {
             MapedFile mapedFile = (MapedFile) mfs[i];
+            //这个是使用file.lastModified方法获得的，在linux环境下有用，windows环境下没什么用
             if (mapedFile.getLastModifiedTimestamp() >= timestamp) {
                 return mapedFile;
             }
