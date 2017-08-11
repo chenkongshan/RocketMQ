@@ -131,7 +131,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
                 /**
                  * 只要是instanceName不同，则就可以拥有单独的MQClientInstance，也就是说一个JVM上是可以存在多个group的client，
                  * 只要client设置单独的instanceName即可，如果不设置instanceName，则默认instanceName设置的是当前应用的PID，
-                 * 此时相当于多个client公用一个MQClientInstance，这个时候是不可以有多个grup的
+                 * 此时相当于多个client公用一个MQClientInstance，这个时候是不可以有多个group的
                  */
                 this.mQClientFactory = MQClientManager.getInstance().getAndCreateMQClientInstance(this.defaultMQProducer, rpcHook);
 
@@ -146,6 +146,7 @@ public class DefaultMQProducerImpl implements MQProducerInner {
 
                 //ConcurrentHashMap<String/* topic */, TopicPublishInfo> topicPublishInfoTable
                 //DEFAULT_TOPIC="TBW102"
+                //默认的topic是TBW102，这个是在broker允许创建topic时使用的默认topic
                 this.topicPublishInfoTable.put(this.defaultMQProducer.getCreateTopicKey(), new TopicPublishInfo());
 
                 if (startFactory) {

@@ -628,6 +628,7 @@ public class BrokerController {
 
         this.registerBrokerAll(true, false);
 
+        //30秒执行一次registerBrokerAll
         this.scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -667,7 +668,7 @@ public class BrokerController {
         RegisterBrokerResult registerBrokerResult = this.brokerOuterAPI.registerBrokerAll(//
                 this.brokerConfig.getBrokerClusterName(), //
                 this.getBrokerAddr(), //
-                this.brokerConfig.getBrokerName(), //
+                this.brokerConfig.getBrokerName(), //InetAddress.getLocalHost().getHostName()
                 this.brokerConfig.getBrokerId(), //
                 this.getHAServerAddr(), //
                 topicConfigWrapper,//
